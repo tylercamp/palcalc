@@ -54,6 +54,40 @@ public class FinalizationAlternativesTests
         Assert.AreEqual(references.Length, alternatives.Results.Count());
     }
 
+    [TestMethod]
+    public void ComparisonMatchesPassiveSetsRegardlessOfOrder()
+    {
+        var source = Owned();
+        var passives = SolverTestScenario.DB.SurgeryPassiveSkills.Take(2).ToArray();
+        var first = new OwnedPalReference(source.UnderlyingInstance, [passives[0], passives[1]], source.IVs, source.AttackProfile);
+        var reordered = new OwnedPalReference(source.UnderlyingInstance, [passives[1], passives[0]], source.IVs, source.AttackProfile);
+        var different = new OwnedPalReference(source.UnderlyingInstance, [passives[0]], source.IVs, source.AttackProfile);
+        var comparison = new FinalizationComparison();
+
+        Assert.AreEqual(comparison.KeyOf(first), comparison.KeyOf(reordered));
+        Assert.AreNotEqual(comparison.KeyOf(first), comparison.KeyOf(different));
+    }
+
+    [TestMethod]
+    public void ComparisonSortsParentInputsAndKeepsRepeatedOccurrences()
+    {
+        var first = Owned();
+        var second = Owned();
+        var third = Owned();
+        var comparison = new FinalizationComparison();
+        comparison.KeyOf(first);
+        comparison.KeyOf(second);
+        comparison.KeyOf(third);
+
+        var root = Breed(Breed(first, third), Breed(first, second));
+
+        Assert.AreEqual("0,0,1,2", comparison.KeyOf(root).Inputs);
+
+        BredPalReference Breed(IPalReference left, IPalReference right) => new(
+            GameSettings.Defaults, first.Pal, PalGender.WILDCARD, left, right, 1, [],
+            new(BreedingMethod.Ordinary, 1), first.IVs, 1, first.AttackProfile, null, null);
+    }
+
     private static OwnedPalReference Owned() => new(
         SolverTestScenario.Owned("Katress", PalGender.MALE), [], new IV_Set(),
         new AttackProfile((byte)1));

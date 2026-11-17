@@ -5,7 +5,9 @@ using PalCalc.Solver.Processing.Attacks;
 using PalCalc.Solver.Processing.Search;
 using PalCalc.Solver.Utils;
 using Serilog;
+using Serilog.Events;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace PalCalc.Solver.Processing;
 
@@ -101,7 +103,7 @@ internal sealed class ResultPostProcessor(
                 return SelectFinalResults(candidates);
 
             stageTimer.Restart();
-            var paths = new FinalizationAlternatives<IPalReference>();
+            var paths = new FinalizationAlternatives<IPalReference>(candidates.Count);
             foreach (var candidate in candidates)
             {
                 controller.PauseIfRequested();
@@ -120,7 +122,7 @@ internal sealed class ResultPostProcessor(
 
         stageTimer.Restart();
         var materializer = new AttackResultMaterializer(attackTargets, settings, controller.CancellationToken);
-        var alternatives = new FinalizationAlternatives<EvaluatedAttackResult>();
+        var alternatives = new FinalizationAlternatives<EvaluatedAttackResult>(candidates.Count);
         foreach (var finalist in candidates)
         {
             controller.PauseIfRequested();
@@ -141,12 +143,22 @@ internal sealed class ResultPostProcessor(
             }
         }
         logger.Debug("Evaluated and compared attack alternatives in {ElapsedMs} ms", stageTimer.ElapsedMilliseconds);
+        if (logger.IsEnabled(LogEventLevel.Debug))
+        {
+            var (groupCount, groupCapacity, passiveSetCount) = alternatives.GetTableStatistics();
+            logger.Debug("Attack alternatives table: {GroupCount} groups, {GroupCapacity} entry slots, {KeyBytes} bytes per key, {PassiveSetCount} interned passive sets, {ManagedHeapMiB:F1} MiB managed heap",
+                groupCount, groupCapacity, Unsafe.SizeOf<FinalizationComparison.Key>(), passiveSetCount, GC.GetTotalMemory(false) / (1024.0 * 1024.0));
+        }
 
+        materializer.ReleaseEvaluationCaches();
         stageTimer.Restart();
-        var materialized = alternatives.Results
-            .Select(materializer.Materialize)
-            .Where(SatisfiesMaterializedConstraints)
-            .ToList();
+        var materialized = new List<IPalReference>(candidates.Count);
+        foreach (var evaluation in alternatives.Results)
+        {
+            var result = materializer.Materialize(evaluation);
+            if (SatisfiesMaterializedConstraints(result))
+                materialized.Add(result);
+        }
         logger.Debug("Attack materialization took {ElapsedMs} ms: {Finalists} alternatives, {Nodes} cached nodes",
             stageTimer.ElapsedMilliseconds, materialized.Count, materializer.MaterializedCount);
 

@@ -29,6 +29,24 @@ public class CandidateSelectionPolicyTests
     }
 
     [TestMethod]
+    public void SelectFinalResults_PreservesFirstSeenGroupAndCandidateOrder()
+    {
+        var calls = new List<string>();
+        var pruning = new ResultPruningPolicy(token => [new RecordingPruning(token, "custom", calls)]);
+        var policy = new DefaultCandidateSelectionPolicy(
+            pruning, CancellationToken.None, attackTargets: null, considerPassiveCakes: true);
+        var owned = SolverTestScenario.Owned("Katress", PalGender.MALE);
+        var first = new OwnedPalReference(owned, [], new IV_Set(), Profile(1));
+        var second = new OwnedPalReference(SolverTestScenario.Owned("Katress", PalGender.MALE), [], new IV_Set(), Profile(1));
+        var sameGroup = new OwnedPalReference(owned, [], new IV_Set(), Profile(2));
+
+        var results = policy.SelectFinalResults([first, second, sameGroup, first]).ToArray();
+
+        CollectionAssert.AreEqual(new IPalReference[] { first, sameGroup, second }, results);
+        CollectionAssert.AreEqual(new[] { "custom" }, calls);
+    }
+
+    [TestMethod]
     public void DefaultPolicy_UsesEarlyEffortAndCostComparison()
     {
         var policy = new DefaultCandidateSelectionPolicy(

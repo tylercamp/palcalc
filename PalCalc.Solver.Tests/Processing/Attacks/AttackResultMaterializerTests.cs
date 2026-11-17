@@ -619,7 +619,11 @@ public class AttackResultMaterializerTests
         var materializer = new AttackResultMaterializer(Context(), settings);
         var bounds = materializer.LowerBounds(wrapped);
 
-        foreach (var result in materializer.Evaluate(wrapped, 1))
+        var evaluations = materializer.Evaluate(wrapped, 1);
+        materializer.ReleaseEvaluationCaches();
+        Assert.AreEqual(0, materializer.EvaluatedStateCount);
+
+        foreach (var result in evaluations)
         {
             Assert.IsTrue(bounds.Covers(result.Metrics));
             Assert.AreEqual(result.BreedingEffort, materializer.Materialize(result).BreedingEffort);

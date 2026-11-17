@@ -267,14 +267,49 @@ internal sealed class DefaultCandidateSelectionPolicy : ICandidateSelectionPolic
         if (!preserveSpecialCakeOptions)
             return distinct.GroupBy(BreedingEffortGroupOf).SelectMany(PruneFinalGroup);
 
-        var comparison = new FinalizationComparison();
-        return distinct
-            .GroupBy(reference => (
-                Outcome: comparison.KeyOf(reference),
-                Effort: BreedingEffortGroupOf(reference),
-                Cakes: reference.ExpectedSpecialCakes
-            ))
-            .SelectMany(PruneFinalGroup);
+        return SelectGroupedFinalists();
+
+        IEnumerable<IPalReference> SelectGroupedFinalists()
+        {
+            foreach (var (first, candidatesInGroup) in GroupFinalists())
+            {
+                if (candidatesInGroup is null && !cancellationToken.IsCancellationRequested)
+                {
+                    yield return first;
+                    continue;
+                }
+
+                foreach (var result in SelectRetainedAlternatives(candidatesInGroup ?? [first]))
+                    yield return result;
+            }
+        }
+
+        List<(IPalReference First, List<IPalReference> Candidates)> GroupFinalists()
+        {
+            var comparison = new FinalizationComparison();
+            var indices = new Dictionary<(FinalizationComparison.Key Outcome, BreedingEffortGroupKey Effort, int Cakes), int>(distinct.Count);
+            // Most groups are singletons. Keep first-seen order in a flat list and only allocate lists for ties.
+            var groups = new List<(IPalReference First, List<IPalReference> Candidates)>(distinct.Count);
+            foreach (var candidate in distinct)
+            {
+                var key = (comparison.KeyOf(candidate), BreedingEffortGroupOf(candidate), candidate.ExpectedSpecialCakes);
+                if (!indices.TryGetValue(key, out var index))
+                {
+                    indices.Add(key, groups.Count);
+                    groups.Add((candidate, null));
+                }
+                else
+                {
+                    var (first, candidatesInGroup) = groups[index];
+                    if (candidatesInGroup is null)
+                        groups[index] = (first, [first, candidate]);
+                    else
+                        candidatesInGroup.Add(candidate);
+                }
+            }
+
+            return groups;
+        }
 
         IEnumerable<IPalReference> PruneFinalGroup(IEnumerable<IPalReference> group)
         {

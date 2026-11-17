@@ -18,12 +18,23 @@ internal readonly record struct BreedingPathMetrics(
 }
 
 /// <summary>Finalization-only comparisons; these never partition the search frontier.</summary>
-internal sealed class FinalizationAlternatives<T>
+internal sealed class FinalizationAlternatives<T>(int capacity = 0)
 {
     private readonly FinalizationComparison comparison = new();
-    private readonly Dictionary<FinalizationComparison.Key, List<(T Result, BreedingPathMetrics Metrics)>> groups = [];
+    private readonly Dictionary<FinalizationComparison.Key, List<(T Result, BreedingPathMetrics Metrics)>> groups = new(capacity);
 
-    public IEnumerable<T> Results => groups.Values.SelectMany(group => group.Select(entry => entry.Result));
+    public IEnumerable<T> Results
+    {
+        get
+        {
+            foreach (var group in groups.Values)
+                foreach (var entry in group)
+                    yield return entry.Result;
+        }
+    }
+
+    internal (int GroupCount, int GroupCapacity, int PassiveSetCount) GetTableStatistics() =>
+        (groups.Count, groups.EnsureCapacity(0), comparison.PassiveSetCount);
 
     public bool DominatesLowerBounds(IPalReference source, BreedingPathMetrics bounds) =>
         groups.TryGetValue(comparison.KeyOf(source), out var group) &&
@@ -33,7 +44,7 @@ internal sealed class FinalizationAlternatives<T>
     {
         var key = comparison.KeyOf(source);
         if (!groups.TryGetValue(key, out var group))
-            groups.Add(key, group = []);
+            groups.Add(key, group = new(1));
         if (group.Any(existing => existing.Metrics.Dominates(metrics)))
             return;
         group.RemoveAll(existing => metrics.Dominates(existing.Metrics));
@@ -46,24 +57,38 @@ internal sealed class FinalizationComparison
 {
     internal readonly record struct Key(
         Pal Pal, PalGender Gender,
-        PassiveSetKey Passives, PassiveSetKey ActualPassives,
+        int EffectivePassivesId, int ActualPassivesId,
         IV_Set IVs,
         int BreedingSteps, int Gold, int WildPals, int RequiredLevels,
         string Inputs
     );
 
     private readonly record struct InputChoice(object Origin, PalGender Gender, LevelRequirements Levels);
+    private readonly Dictionary<PassiveSetKey, int> passiveSetIds = [];
     private readonly Dictionary<InputChoice, int> inputIds = [];
     private readonly Dictionary<IPalReference, int[]> inputs = new(ReferenceEqualityComparer.Instance);
+
+    internal int PassiveSetCount => passiveSetIds.Count;
 
     // TODO - Would rather avoid this massive sort of combined key, if possible
     public Key KeyOf(IPalReference reference) => new(
         reference.Pal, reference.Gender,
-        new(reference.EffectivePassives), new(reference.ActualPassives),
+        PassiveSetId(reference.EffectivePassives), PassiveSetId(reference.ActualPassives),
         reference.IVs,
         reference.NumTotalBreedingSteps, reference.TotalCost, reference.NumTotalWildPals, reference.TotalRequiredLevels,
         string.Join(",", InputsOf(reference))
     );
+
+    // (a `PassiveSetKey` is relatively large, and worst-case there can be millions of interim records
+    // during finalization. use a slimmer, intern'd ID instead of full `PassiveSetKey` for `Key`)
+    private int PassiveSetId(IReadOnlyList<PassiveSkill> passives)
+    {
+        // Keep the full set in this shared table so each finalist only stores its ID.
+        var key = new PassiveSetKey(passives);
+        if (!passiveSetIds.TryGetValue(key, out var id))
+            passiveSetIds.Add(key, id = passiveSetIds.Count);
+        return id;
+    }
 
     private int[] InputsOf(IPalReference reference)
     {
@@ -71,7 +96,7 @@ internal sealed class FinalizationComparison
             return cached;
         int[] result;
         if (reference is BredPalReference bred)
-            result = InputsOf(bred.Parent1).Concat(InputsOf(bred.Parent2)).Order().ToArray();
+            result = MergeSortedInputs(InputsOf(bred.Parent1), InputsOf(bred.Parent2));
         else if (reference is SurgeryTablePalReference surgery)
             result = InputsOf(surgery.Input);
         else
@@ -93,5 +118,20 @@ internal sealed class FinalizationComparison
         }
         inputs.Add(reference, result);
         return result;
+    }
+
+    private static int[] MergeSortedInputs(int[] first, int[] second)
+    {
+        var merged = new int[first.Length + second.Length];
+        int i = 0, j = 0;
+        while (i < first.Length && j < second.Length)
+        {
+            var index = i + j;
+            merged[index] = first[i] <= second[j] ? first[i++] : second[j++];
+        }
+
+        first.AsSpan(i).CopyTo(merged.AsSpan(i + j));
+        second.AsSpan(j).CopyTo(merged.AsSpan(first.Length + j));
+        return merged;
     }
 }

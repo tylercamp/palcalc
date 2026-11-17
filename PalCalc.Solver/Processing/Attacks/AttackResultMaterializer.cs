@@ -72,16 +72,23 @@ internal sealed class AttackResultMaterializer
     private readonly ActiveSkill[][] attacksByMask;
     private readonly Dictionary<(Pal Pal, byte InheritedMask), ActiveSkill[]> childLearnedAttacks =
         [];
-    private readonly Dictionary<ResultKey, IReadOnlyList<EvaluatedAttackResult>> evaluated = [];
+    private Dictionary<ResultKey, IReadOnlyList<EvaluatedAttackResult>> evaluated = [];
     private readonly Dictionary<EvaluatedAttackResult, IPalReference> materialized =
         new(ReferenceEqualityComparer.Instance);
     private readonly CancellationToken cancellationToken;
-    private readonly Dictionary<IPalReference, TimeSpan> effortBounds = new(ReferenceEqualityComparer.Instance);
+    private Dictionary<IPalReference, TimeSpan> effortBounds = new(ReferenceEqualityComparer.Instance);
 
     internal int EvaluatedStateCount => evaluated.Count;
     internal int MaterializedCount => materialized.Count;
     internal int EvaluationCacheHits { get; private set; }
     internal int EvaluatedChoiceCount { get; private set; }
+
+    internal void ReleaseEvaluationCaches()
+    {
+        // The selected results link to their parents, so materialization only needs those results.
+        evaluated = [];
+        effortBounds = new(ReferenceEqualityComparer.Instance);
+    }
 
     public BreedingPathMetrics LowerBounds(IPalReference source) =>
         new(EffortLowerBound(source), source.BaseSpecialCakes);
