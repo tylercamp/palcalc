@@ -64,7 +64,7 @@ namespace PalCalc.UI.View.Pal
         public IVValueViewModel IV_Defense
         {
             get => GetValue(IV_DefenseProperty) as IVValueViewModel;
-            set => SetValue(IV_AttackProperty, value);
+            set => SetValue(IV_DefenseProperty, value);
         }
     }
 }
