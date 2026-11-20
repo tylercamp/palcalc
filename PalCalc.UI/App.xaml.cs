@@ -3,6 +3,7 @@ using PalCalc.Model;
 using PalCalc.SaveReader;
 using PalCalc.UI.Localization;
 using PalCalc.UI.Model;
+using PalCalc.UI.Persistence;
 using PalCalc.UI.ViewModel;
 using Serilog;
 using System;
@@ -25,7 +26,7 @@ namespace PalCalc.UI
     /// </summary>
     public partial class App : Application
     {
-        public static string Version => "v1.22.0";
+        public static string Version => "v1.23.0";
         public static string RepositoryUrl => "https://github.com/tylercamp/palcalc/";
 
         private static ILogger logger;
@@ -67,7 +68,17 @@ namespace PalCalc.UI
 
             // Storage initialization runs migrations. Keep logging available before it touches
             // any authoritative data so failures are diagnosable and manifest updates stay last.
-            Storage.Init();
+            try
+            {
+                Storage.Init();
+            }
+            catch (StorageMigrationBackupException ex)
+            {
+                logger.Error(ex, "Unable to prepare the data backup or finish migration");
+                System.Windows.MessageBox.Show(ex.Message, "PalCalc", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                Shutdown(1);
+                return;
+            }
 
             PalDB.BeginLoadEmbedded();
             Task.Run(() =>
