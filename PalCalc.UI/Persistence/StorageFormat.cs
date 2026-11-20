@@ -70,21 +70,19 @@ namespace PalCalc.UI.Persistence
 
         public void WriteManifest(int version) => StorageFile.WriteAtomic(
             ManifestPath,
-            JsonConvert.SerializeObject(new StorageManifest { Version = version }),
-            backup: false
+            JsonConvert.SerializeObject(new StorageManifest { Version = version })
         );
     }
 
     internal static class StorageFile
     {
-        public static void WriteAtomic(string path, string contents, bool backup, string backupSuffix = ".bak")
+        public static void WriteAtomic(string path, string contents)
         {
             var directory = Path.GetDirectoryName(path);
             if (!string.IsNullOrEmpty(directory))
                 Directory.CreateDirectory(directory);
 
             var tempPath = path + $".tmp-{Guid.NewGuid():N}";
-            var backupPath = path + backupSuffix;
 
             try
             {
@@ -95,10 +93,6 @@ namespace PalCalc.UI.Persistence
                     writer.Flush();
                     stream.Flush(flushToDisk: true);
                 }
-
-                // Keep the first pre-migration copy across retries and later migration steps.
-                if (backup && File.Exists(path) && !File.Exists(backupPath))
-                    File.Copy(path, backupPath, overwrite: true);
 
                 File.Move(tempPath, path, overwrite: true);
             }
@@ -116,13 +110,15 @@ namespace PalCalc.UI.Persistence
 
         public static void EnsureCurrent(string dataPath)
         {
+            dataPath = Path.TrimEndingDirectorySeparator(Path.GetFullPath(dataPath));
             Directory.CreateDirectory(dataPath);
 
+            var backup = new StorageMigrationBackup(dataPath);
             var manifestPath = StorageFormat.ManifestPath(dataPath);
             if (!File.Exists(manifestPath))
             {
                 logger.Information("Persistent version manifest file missing");
-                if (!StorageFormat.HasDataFiles(dataPath))
+                if (!backup.IsPending && !StorageFormat.HasDataFiles(dataPath))
                 {
                     logger.Information("No data files found, assuming fresh install");
                     new StorageMigrationContext(dataPath).WriteManifest(StorageFormat.CurrentVersion);
@@ -138,6 +134,13 @@ namespace PalCalc.UI.Persistence
                 ? ReadManifest(manifestPath).Version
                 : StorageFormat.LegacyVersion;
 
+            var needsMigration = currentVersion >= StorageFormat.LegacyVersion && currentVersion < StorageFormat.CurrentVersion;
+            using var migrationLock = needsMigration || (currentVersion == StorageFormat.CurrentVersion && backup.IsPending)
+                ? backup.LockMigration()
+                : null;
+            if (migrationLock != null)
+                currentVersion = File.Exists(manifestPath) ? ReadManifest(manifestPath).Version : StorageFormat.LegacyVersion;
+
             logger.Information("Preparing migrations from detected manifest version {Version} to current version {Latest}", currentVersion, StorageFormat.CurrentVersion);
 
             if (currentVersion > StorageFormat.CurrentVersion)
@@ -152,6 +155,8 @@ namespace PalCalc.UI.Persistence
 
             if (currentVersion == StorageFormat.CurrentVersion)
             {
+                if (migrationLock != null)
+                    backup.Complete();
                 logger.Information("No migrations needed");
                 return;
             }
@@ -159,6 +164,7 @@ namespace PalCalc.UI.Persistence
             var migrations = DiscoverMigrations();
             ValidateRoutes(migrations);
 
+            backup.EnsureCreated(currentVersion);
             var context = new StorageMigrationContext(dataPath);
             while (currentVersion < StorageFormat.CurrentVersion)
             {
@@ -179,6 +185,8 @@ namespace PalCalc.UI.Persistence
 
                 logger.Information("Migration step complete");
             }
+
+            backup.Complete();
         }
 
         private static StorageManifest ReadManifest(string path)

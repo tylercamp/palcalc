@@ -21,7 +21,7 @@ namespace PalCalc.UI.Persistence.Migrations
                             if (result?["PalReference"] is JObject reference)
                                 AddLevelRequirements(reference);
                     }
-                    StorageFile.WriteAtomic(path, target.ToString(Formatting.None), backup: true);
+                    StorageFile.WriteAtomic(path, target.ToString(Formatting.None));
                 }
             }
         }

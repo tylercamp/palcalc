@@ -60,7 +60,7 @@ namespace PalCalc.UI.Persistence.Migrations
                 return;
 
             var root = JObject.Parse(File.ReadAllText(path));
-            StorageFile.WriteAtomic(path, NormalizeAppSettings(root).ToString(Formatting.None), backup: true);
+            StorageFile.WriteAtomic(path, NormalizeAppSettings(root).ToString(Formatting.None));
         }
 
         private static void RewriteGameSettings(string dataPath)
@@ -75,7 +75,7 @@ namespace PalCalc.UI.Persistence.Migrations
                     continue;
 
                 var root = JObject.Parse(File.ReadAllText(path));
-                StorageFile.WriteAtomic(path, NormalizeGameSettings(root).ToString(Formatting.None), backup: true);
+                StorageFile.WriteAtomic(path, NormalizeGameSettings(root).ToString(Formatting.None));
             }
         }
 
@@ -91,7 +91,7 @@ namespace PalCalc.UI.Persistence.Migrations
                     continue;
 
                 var root = JObject.Parse(File.ReadAllText(path));
-                StorageFile.WriteAtomic(path, NormalizeCustomizations(root).ToString(Formatting.None), backup: true);
+                StorageFile.WriteAtomic(path, NormalizeCustomizations(root).ToString(Formatting.None));
             }
         }
 
@@ -133,10 +133,10 @@ namespace PalCalc.UI.Persistence.Migrations
                     if (!string.Equals(documentId, targetId, StringComparison.Ordinal))
                         throw new StorageFormatException($"Target filename '{targetId}' does not match document ID '{documentId}'.");
 
-                    StorageFile.WriteAtomic(path, target.ToString(Formatting.None), backup: true);
+                    StorageFile.WriteAtomic(path, target.ToString(Formatting.None));
                 }
 
-                StorageFile.WriteAtomic(indexPath, index.ToString(Formatting.None), backup: true);
+                StorageFile.WriteAtomic(indexPath, index.ToString(Formatting.None));
             }
         }
 
@@ -161,8 +161,7 @@ namespace PalCalc.UI.Persistence.Migrations
                 targetIds.Add(documentId);
                 StorageFile.WriteAtomic(
                     Path.Combine(targetsPath, TargetFileName(documentId)),
-                    target.ToString(Formatting.None),
-                    backup: true
+                    target.ToString(Formatting.None)
                 );
             }
 
@@ -171,13 +170,8 @@ namespace PalCalc.UI.Persistence.Migrations
                 ["OrderedTargetIds"] = new JArray(targetIds.Distinct()),
                 ["SourcePals"] = source.DeepClone(),
             };
-            StorageFile.WriteAtomic(indexPath, indexDocument.ToString(Formatting.None), backup: true);
-
-            var backupPath = monolithPath + ".bak";
-            if (!File.Exists(backupPath))
-                File.Move(monolithPath, backupPath);
-            else
-                File.Delete(monolithPath);
+            StorageFile.WriteAtomic(indexPath, indexDocument.ToString(Formatting.None));
+            File.Delete(monolithPath);
         }
 
         private static JObject ParseIndex(JObject root) => new()

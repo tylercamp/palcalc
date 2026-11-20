@@ -35,9 +35,23 @@ Download `PalCalc.UI.exe`, place it in its own folder, and run it. When run for 
 
 ### ZIP package - antivirus fallback
 
-If antivirus software interferes with the standalone EXE, download `PalCalc-NoBundle.zip` instead. Extract the full contents into their own folder and run the included `PalCalc.UI.exe`. When updating, replace all files in that folder.
+If antivirus software interferes with the standalone EXE, download `PalCalc-NoBundle.zip` instead. Extract the full contents into their own folder and run the included `PalCalc.UI.exe`. When updating, close PalCalc and replace the app files in that folder.
 
 PalCalc does not require administrator access. If it unexpectedly asks for elevated permissions, do not continue and [report the problem](https://github.com/tylercamp/palcalc/issues).
+
+### Return to an older release after a data migration
+
+When a PalCalc update needs to migrate your data, PalCalc first copies the entire `data` folder into `data-backups` beside the original `data` folder. Backup folders are named `backup-pre-{App.Version}`, for example `backup-pre-v1.23.0__1` for a backup made by PalCalc v1.23.0, just before migrating the data. Backups are never deleted by PalCalc. You may delete them manually.
+
+To restore one of these backups and run an older PalCalc version:
+
+1. Close all running PalCalc windows.
+2. Delete, rename, or move the existing `data` folder next to the PalCalc EXE.
+3. In the `data-backups` folder, find the backup from before the update. Copy that folder next to the PalCalc EXE and rename it to `data`.
+4. Replace the PalCalc program files with the older version, using the standard installation steps.
+5. Run the PalCalc EXE. This restores the settings, targets, and other PalCalc data from the time of the backup.
+
+_The auto-backup feature was added in PalCalc v1.23.0 and is not available in earlier versions._
 
 ## Features
 

@@ -21,7 +21,7 @@ namespace PalCalc.UI.Persistence.Migrations
                         continue;
 
                     results["SelectedResultIndex"] = -1;
-                    StorageFile.WriteAtomic(path, root.ToString(Formatting.None), backup: true);
+                    StorageFile.WriteAtomic(path, root.ToString(Formatting.None));
                 }
             }
         }

@@ -27,7 +27,7 @@ namespace PalCalc.UI.Persistence.Migrations
                         }
                     }
 
-                    StorageFile.WriteAtomic(path, target.ToString(Formatting.None), backup: true);
+                    StorageFile.WriteAtomic(path, target.ToString(Formatting.None));
                 }
             }
         }

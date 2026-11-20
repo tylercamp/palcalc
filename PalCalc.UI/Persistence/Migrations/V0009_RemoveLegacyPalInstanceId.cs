@@ -34,11 +34,7 @@ namespace PalCalc.UI.Persistence.Migrations
                 changed |= snapshot.Remove("InstanceId");
 
             if (changed)
-            {
-                // Keep a copy of the v8 document even when an earlier migration left a backup.
-                var backupSuffix = File.Exists(path + ".bak") ? ".v8.bak" : ".bak";
-                StorageFile.WriteAtomic(path, document.ToString(Formatting.None), backup: true, backupSuffix: backupSuffix);
-            }
+                StorageFile.WriteAtomic(path, document.ToString(Formatting.None));
         }
     }
 }

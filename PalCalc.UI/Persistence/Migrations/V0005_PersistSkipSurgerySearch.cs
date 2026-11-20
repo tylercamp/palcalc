@@ -16,7 +16,7 @@ namespace PalCalc.UI.Persistence.Migrations
                 var settings = JObject.Parse(File.ReadAllText(settingsPath));
                 if (settings["SolverSettings"] is JObject solverSettings)
                     solverSettings["SkipSurgerySearch"] ??= false;
-                StorageFile.WriteAtomic(settingsPath, settings.ToString(Formatting.None), backup: true);
+                StorageFile.WriteAtomic(settingsPath, settings.ToString(Formatting.None));
             }
 
             foreach (var targetsPath in Directory.EnumerateDirectories(context.DataPath, "targets", SearchOption.AllDirectories))
@@ -27,7 +27,7 @@ namespace PalCalc.UI.Persistence.Migrations
                     if (target["CurrentResults"] is JObject results &&
                         results["SolverSettings"] is JObject solverSettings)
                         solverSettings["SkipSurgerySearch"] ??= false;
-                    StorageFile.WriteAtomic(path, target.ToString(Formatting.None), backup: true);
+                    StorageFile.WriteAtomic(path, target.ToString(Formatting.None));
                 }
             }
         }

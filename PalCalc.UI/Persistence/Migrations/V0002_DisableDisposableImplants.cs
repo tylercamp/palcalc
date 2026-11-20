@@ -56,7 +56,7 @@ namespace PalCalc.UI.Persistence.Migrations
             }
 
             solverSettings["BannedSurgeryPassiveInternalNames"] = banned;
-            StorageFile.WriteAtomic(path, root.ToString(Formatting.None), backup: true);
+            StorageFile.WriteAtomic(path, root.ToString(Formatting.None));
         }
 
         private static bool ContainsString(IEnumerable<JToken> values, string expected)

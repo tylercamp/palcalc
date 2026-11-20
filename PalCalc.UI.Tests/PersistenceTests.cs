@@ -65,6 +65,9 @@ namespace PalCalc.UI.Tests
 
             Assert.IsNotNull(manifest);
             Assert.AreEqual(StorageFormat.CurrentVersion, manifest.Version);
+
+            StorageMigrationRunner.EnsureCurrent(path);
+            Assert.IsFalse(Directory.Exists(path + "-backups"));
         });
     }
 
@@ -75,6 +78,7 @@ namespace PalCalc.UI.Tests
         {
             var results = Directory.CreateDirectory(Path.Combine(path, "results"));
             File.WriteAllText(Path.Combine(results.FullName, "legacy.txt"), "legacy");
+            Directory.CreateDirectory(Path.Combine(path, "empty"));
 
             var settings = new AppSettings
             {
@@ -96,8 +100,7 @@ namespace PalCalc.UI.Tests
 
             Assert.AreEqual("legacy", File.ReadAllText(Path.Combine(path, "legacy.txt")));
             Assert.IsFalse(Directory.Exists(results.FullName));
-            Assert.IsTrue(File.Exists(Path.Combine(path, "settings.json.bak")));
-            Assert.IsTrue(File.Exists(Path.Combine(savePath.FullName, "game-settings.json.bak")));
+            Assert.IsEmpty(Directory.GetFiles(path, "*.bak", SearchOption.AllDirectories));
 
             var currentSettings = AppSettingsJsonSerializer.FromCurrentJson(
                 File.ReadAllText(Path.Combine(path, "settings.json"))
@@ -112,6 +115,90 @@ namespace PalCalc.UI.Tests
             Assert.AreEqual(300, currentGameSettings.BreedingTimeSeconds);
             Assert.AreEqual(0, currentGameSettings.MassiveEggIncubationTimeMinutes);
             Assert.IsTrue(currentGameSettings.MultipleBreedingFarms);
+
+            var snapshot = Directory.GetDirectories(path + "-backups").Single();
+            Assert.IsFalse(File.Exists(StorageFormat.ManifestPath(snapshot)));
+            Assert.AreEqual("legacy", File.ReadAllText(Path.Combine(snapshot, "results", "legacy.txt")));
+            Assert.IsTrue(Directory.Exists(Path.Combine(snapshot, "empty")));
+            Assert.AreEqual(JsonConvert.SerializeObject(settings), File.ReadAllText(Path.Combine(snapshot, "settings.json")));
+        });
+    }
+
+    [TestMethod]
+    public void MigrationRetryKeepsTheSnapshotFromBeforeTheFirstStep()
+    {
+        WithTemporaryDirectory(path =>
+        {
+            var manifestPath = StorageFormat.ManifestPath(path);
+            const string originalManifest = """{"version":7}""";
+            File.WriteAllText(manifestPath, originalManifest);
+            var settingsPath = Path.Combine(path, "settings.json");
+            const string originalSettings = """{"SolverSettings":{}}""";
+            File.WriteAllText(settingsPath, originalSettings);
+            var savePath = Directory.CreateDirectory(Path.Combine(path, "save-1"));
+            var customizationsPath = Path.Combine(savePath.FullName, "custom-containers.json");
+            File.WriteAllText(customizationsPath, "invalid json");
+
+            Assert.Throws<JsonReaderException>(() => StorageMigrationRunner.EnsureCurrent(path));
+            Assert.AreEqual(8, JObject.Parse(File.ReadAllText(manifestPath))["version"]!.Value<int>());
+
+            File.WriteAllText(customizationsPath, """{"CustomContainers":[]}""");
+            StorageMigrationRunner.EnsureCurrent(path);
+            StorageMigrationRunner.EnsureCurrent(path);
+
+            Assert.AreEqual(StorageFormat.CurrentVersion, JObject.Parse(File.ReadAllText(manifestPath))["version"]!.Value<int>());
+            var snapshot = Directory.GetDirectories(path + "-backups").Single();
+            Assert.AreEqual(originalManifest, File.ReadAllText(StorageFormat.ManifestPath(snapshot)));
+            Assert.AreEqual($"backup-pre-{App.Version}__1", Path.GetFileName(snapshot));
+            Assert.AreEqual(originalSettings, File.ReadAllText(Path.Combine(snapshot, "settings.json")));
+            Assert.AreEqual("invalid json", File.ReadAllText(Path.Combine(snapshot, "save-1", "custom-containers.json")));
+        });
+    }
+
+    [TestMethod]
+    public void MigrationBackupUsesTheFirstAvailableNumber()
+    {
+        WithTemporaryDirectory(path =>
+        {
+            var backupRoot = path + "-backups";
+            var firstBackup = Directory.CreateDirectory(Path.Combine(backupRoot, $"backup-pre-{App.Version}__1"));
+            File.WriteAllText(Path.Combine(firstBackup.FullName, "keep.txt"), "original backup");
+            Directory.CreateDirectory(Path.Combine(backupRoot, $"backup-pre-{App.Version}__3"));
+            File.WriteAllText(StorageFormat.ManifestPath(path), """{"version":8}""");
+
+            StorageMigrationRunner.EnsureCurrent(path);
+
+            var snapshot = Path.Combine(backupRoot, $"backup-pre-{App.Version}__2");
+            Assert.AreEqual(8, JObject.Parse(File.ReadAllText(StorageFormat.ManifestPath(snapshot)))["version"]!.Value<int>());
+            Assert.AreEqual("original backup", File.ReadAllText(Path.Combine(firstBackup.FullName, "keep.txt")));
+            Assert.HasCount(3, Directory.GetDirectories(backupRoot));
+        });
+    }
+
+    [TestMethod]
+    public void BackupFailureLeavesTheDataAndManifestUntouched()
+    {
+        WithTemporaryDirectory(path =>
+        {
+            var manifestPath = StorageFormat.ManifestPath(path);
+            const string originalManifest = """{"version":7}""";
+            File.WriteAllText(manifestPath, originalManifest);
+            var settingsPath = Path.Combine(path, "settings.json");
+            const string originalSettings = """{"SolverSettings":{}}""";
+            File.WriteAllText(settingsPath, originalSettings);
+
+            using (File.Open(settingsPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            {
+                var error = Assert.Throws<StorageMigrationBackupException>(() => StorageMigrationRunner.EnsureCurrent(path));
+                StringAssert.Contains(error.Message, path + "-backups");
+            }
+
+            Assert.AreEqual(originalManifest, File.ReadAllText(manifestPath));
+            Assert.AreEqual(originalSettings, File.ReadAllText(settingsPath));
+            Assert.IsEmpty(Directory.GetFileSystemEntries(path + "-backups"));
+
+            StorageMigrationRunner.EnsureCurrent(path);
+            Assert.AreEqual(originalManifest, File.ReadAllText(StorageFormat.ManifestPath(Directory.GetDirectories(path + "-backups").Single())));
         });
     }
 
@@ -216,7 +303,6 @@ namespace PalCalc.UI.Tests
                 File.ReadAllText(Path.Combine(targetsPath.FullName, "target-1.json")));
             Assert.AreEqual("Pal_Internal", migrated.TargetPalInternalName);
             Assert.AreEqual("Swift_Internal", migrated.RequiredPassiveInternalNames[0]);
-            Assert.IsTrue(File.Exists(Path.Combine(savePath.FullName, "pal-target-ids.json.bak")));
             var manifest = JsonConvert.DeserializeObject<StorageManifest>(
                 File.ReadAllText(Path.Combine(path, StorageFormat.ManifestFileName)));
             Assert.IsNotNull(manifest);
@@ -444,9 +530,8 @@ namespace PalCalc.UI.Tests
         WithTemporaryDirectory(path =>
         {
             var savePath = Directory.CreateDirectory(Path.Combine(path, "save-1"));
-            File.WriteAllText(
-                Path.Combine(savePath.FullName, "pal-targets.json"),
-                """
+            var monolithPath = Path.Combine(savePath.FullName, "pal-targets.json");
+            const string monolith = """
                 {
                   "Targets": [
                     {
@@ -457,10 +542,15 @@ namespace PalCalc.UI.Tests
                     }
                   ]
                 }
-                """
-            );
+                """;
+            File.WriteAllText(monolithPath, monolith);
 
             StorageMigrationRunner.EnsureCurrent(path);
+
+            var snapshot = Directory.GetDirectories(path + "-backups").Single();
+            Assert.AreEqual(monolith, File.ReadAllText(Path.Combine(snapshot, "save-1", "pal-targets.json")));
+            Assert.IsFalse(File.Exists(monolithPath));
+            Assert.IsEmpty(Directory.GetFiles(path, "*.bak", SearchOption.AllDirectories));
 
             var target = JObject.Parse(File.ReadAllText(
                 Path.Combine(savePath.FullName, "targets", "attack-target.json")
@@ -470,22 +560,6 @@ namespace PalCalc.UI.Tests
                 new[] { "Attack_A", "Attack_B" },
                 target["RequiredAttackInternalNames"]!.Values<string>().ToArray()
             );
-        });
-    }
-
-    [TestMethod]
-    public void AtomicMigrationBackupPreservesTheOriginalAcrossRetries()
-    {
-        WithTemporaryDirectory(path =>
-        {
-            var file = Path.Combine(path, "settings.json");
-            File.WriteAllText(file, "original");
-
-            StorageFile.WriteAtomic(file, "first migration", backup: true);
-            StorageFile.WriteAtomic(file, "retry", backup: true);
-
-            Assert.AreEqual("original", File.ReadAllText(file + ".bak"));
-            Assert.AreEqual("retry", File.ReadAllText(file));
         });
     }
 
@@ -656,8 +730,6 @@ namespace PalCalc.UI.Tests
                 new[] { 1, 1, 4 },
                 migratedTarget.SelectTokens("$..Instance").OfType<JObject>().Select(i => i["Rank"]!.ToObject<int>()).ToArray());
 
-            Assert.IsTrue(File.Exists(customizationsPath + ".bak"));
-            Assert.IsTrue(File.Exists(targetPath + ".bak"));
             Assert.AreEqual(StorageFormat.CurrentVersion, JsonConvert.DeserializeObject<StorageManifest>(File.ReadAllText(StorageFormat.ManifestPath(path)))!.Version);
         });
     }
@@ -868,7 +940,6 @@ namespace PalCalc.UI.Tests
             Assert.IsNotNull(ResultJsonSerializer.FromDto(dto.Results[0].PalReference, db, new GameSettings(), new SerializableSolverSettings()));
             preserved["CurrentResults"]!["SolverSettings"]!["AllowSpecialCakesForPassives"] = false;
             Assert.IsTrue(JToken.DeepEquals(preserved, JObject.Parse(File.ReadAllText(preservedPath))));
-            Assert.IsTrue(File.Exists(targetPath + ".bak"));
             Assert.AreEqual(StorageFormat.CurrentVersion, JsonConvert.DeserializeObject<StorageManifest>(File.ReadAllText(StorageFormat.ManifestPath(path)))!.Version);
             var migratedText = File.ReadAllText(targetPath);
             StorageMigrationRunner.EnsureCurrent(path);
@@ -920,8 +991,9 @@ namespace PalCalc.UI.Tests
             var migratedResults = ResultJsonSerializer.FromCurrentJson(migrated["CurrentResults"]!.ToString());
             Assert.AreEqual(existingChoice ?? false, migratedResults.SolverSettings.AllowSpecialCakesForPassives);
             Assert.AreEqual(JTokenType.Null, JObject.Parse(File.ReadAllText(emptyTargetPath))["CurrentResults"]!.Type);
-            Assert.AreEqual(originalSettings, File.ReadAllText(settingsPath + ".bak"));
-            Assert.AreEqual(originalTarget, File.ReadAllText(targetPath + ".bak"));
+            var snapshot = Directory.GetDirectories(path + "-backups").Single();
+            Assert.AreEqual(originalSettings, File.ReadAllText(Path.Combine(snapshot, Path.GetRelativePath(path, settingsPath))));
+            Assert.AreEqual(originalTarget, File.ReadAllText(Path.Combine(snapshot, Path.GetRelativePath(path, targetPath))));
             Assert.AreEqual(StorageFormat.CurrentVersion,
                 JsonConvert.DeserializeObject<StorageManifest>(File.ReadAllText(StorageFormat.ManifestPath(path)))!.Version);
             var migratedText = File.ReadAllText(targetPath);
@@ -931,7 +1003,7 @@ namespace PalCalc.UI.Tests
     }
 
     [TestMethod]
-    public void VersionEightBacksUpAndRemovesOnlyLegacyPalInstanceIds()
+    public void VersionEightRemovesOnlyLegacyPalInstanceIds()
     {
         WithTemporaryDirectory(path =>
         {
@@ -977,24 +1049,27 @@ namespace PalCalc.UI.Tests
             Assert.IsNull(nested["InstanceId"]);
             Assert.IsNull(nested["PalInstanceId"]);
             Assert.AreEqual(7, nested["Level"]!.Value<int>());
-            Assert.AreEqual(customizations, File.ReadAllText(customizationsPath + ".bak"));
-            Assert.AreEqual("earlier backup", File.ReadAllText(targetPath + ".bak"));
-            Assert.AreEqual(target, File.ReadAllText(targetPath + ".v8.bak"));
+            var snapshot = Directory.GetDirectories(path + "-backups").Single();
+            Assert.AreEqual(customizations, File.ReadAllText(Path.Combine(snapshot, "save", "custom-containers.json")));
+            Assert.AreEqual(target, File.ReadAllText(Path.Combine(snapshot, "save", "targets", "target.json")));
             Assert.AreEqual(unaffected, File.ReadAllText(unaffectedPath));
-            Assert.IsFalse(File.Exists(unaffectedPath + ".bak"));
+            CollectionAssert.AreEqual(new[] { targetPath + ".bak" }, Directory.GetFiles(path, "*.bak", SearchOption.AllDirectories));
+            Assert.AreEqual("earlier backup", File.ReadAllText(targetPath + ".bak"));
             Assert.AreEqual(9, JObject.Parse(File.ReadAllText(manifestPath))["version"]!.Value<int>());
 
-            // Replaying after the documents were written must preserve the backups.
+            // Replaying after the documents were written must leave them alone.
+            File.AppendAllText(targetPath, " ");
+            var migratedText = File.ReadAllText(targetPath);
             File.WriteAllText(manifestPath, """{"version":8}""");
             StorageMigrationRunner.EnsureCurrent(path);
-            Assert.IsFalse(File.Exists(customizationsPath + ".v8.bak"));
-            Assert.AreEqual(target, File.ReadAllText(targetPath + ".v8.bak"));
+            Assert.AreEqual(migratedText, File.ReadAllText(targetPath));
         });
     }
 
     private static void WithTemporaryDirectory(Action<string> action)
     {
-        var path = Path.Combine(Path.GetTempPath(), "palcalc-persistence-" + Guid.NewGuid().ToString("N"));
+        var root = Path.Combine(Path.GetTempPath(), "palcalc-persistence-" + Guid.NewGuid().ToString("N"));
+        var path = Path.Combine(root, "data");
         Directory.CreateDirectory(path);
         try
         {
@@ -1002,8 +1077,8 @@ namespace PalCalc.UI.Tests
         }
         finally
         {
-            if (Directory.Exists(path))
-                Directory.Delete(path, recursive: true);
+            if (Directory.Exists(root))
+                Directory.Delete(root, recursive: true);
         }
     }
 }

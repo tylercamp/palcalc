@@ -17,7 +17,7 @@ namespace PalCalc.UI.Persistence.Migrations
                     foreach (var instance in container?["Contents"] as JArray ?? [])
                         if (instance is JObject palInstance)
                             palInstance["Rank"] ??= 1;
-                StorageFile.WriteAtomic(path, customizations.ToString(Formatting.None), backup: true);
+                StorageFile.WriteAtomic(path, customizations.ToString(Formatting.None));
             }
 
             foreach (var targetsPath in Directory.EnumerateDirectories(context.DataPath, "targets", SearchOption.AllDirectories))
@@ -31,7 +31,7 @@ namespace PalCalc.UI.Persistence.Migrations
                             if (result?["PalReference"] is JObject reference)
                                 AddRank(reference);
                     }
-                    StorageFile.WriteAtomic(path, target.ToString(Formatting.None), backup: true);
+                    StorageFile.WriteAtomic(path, target.ToString(Formatting.None));
                 }
             }
         }
