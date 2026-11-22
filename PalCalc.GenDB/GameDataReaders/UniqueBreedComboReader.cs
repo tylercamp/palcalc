@@ -30,12 +30,11 @@ namespace PalCalc.GenDB.GameDataReaders
     {
         private static ILogger logger = Log.ForContext<UniqueBreedComboReader>();
 
-        public static List<((string, PalGender?), (string, PalGender?), string)> ReadUniqueBreedCombos(IFileProvider provider)
+        public static List<UniqueBreedingCombo> ReadUniqueBreedCombos(IFileProvider provider)
         {
             logger.Information("Reading unique breeding combos");
             var rawCombos = provider.LoadPackageObject<UDataTable>(AssetPaths.PALS_UNIQUE_BREEDING_PATH);
 
-            string TribeToPal(string tribe) => tribe.Split("::").Last();
             PalGender? StringToGender(string gender) => gender switch
             {
                 "EPalGenderType::None" => null,
@@ -44,17 +43,15 @@ namespace PalCalc.GenDB.GameDataReaders
                 _ => throw new ArgumentException($"Unknown gender type: {gender}")
             };
 
-            List<((string, PalGender?), (string, PalGender?), string)> result = [];
+            List<UniqueBreedingCombo> result = [];
 
             foreach (var entry in rawCombos.RowMap.Values)
             {
-                // data model specifies breeding by "tribe", which seems to represent groups of pal types, but in practice
-                // every pal gets its own tribe atm
                 var combo = entry.ToObject<UCombiUnique>();
                 result.Add(
-                    (
-                        (TribeToPal(combo.ParentTribeA), StringToGender(combo.ParentGenderA)),
-                        (TribeToPal(combo.ParentTribeB), StringToGender(combo.ParentGenderB)),
+                    new UniqueBreedingCombo(
+                        (combo.ParentTribeA, StringToGender(combo.ParentGenderA)),
+                        (combo.ParentTribeB, StringToGender(combo.ParentGenderB)),
                         combo.ChildCharacterID
                     )
                 );

@@ -114,8 +114,7 @@ public sealed class BreedableCalculator(BreedingSolverSettings settings)
                 ))
                 .OrderBy(e => e.Tier)
                 .ThenBy(e => e.Pal.InternalIndex),
-            settings.BreedingDB.BreedingRowsByChild
-                .Select(group => group.Key)
+            settings.DB.Pals
                 .Where(p => !available.ContainsKey(p) && p.InternalName != HiddenPalInternalName)
                 .OrderBy(p => p.InternalIndex)
         );

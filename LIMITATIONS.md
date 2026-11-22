@@ -134,10 +134,10 @@ bonus rate across different capture or pickup situations. Rates for setups where
 companion ranks or active bonus sources change during the process haven't been
 established.
 
-PalCalc's species database hasn't been shown to match every live pairing. Ties,
-special recipes and variant parents can affect the result. See the
-[species comparison](PalCalc.Solver/README.md#species-database) for the remaining
-data checks.
+PalCalc's species database covers ordinary pairings among catalog Pals at their
+base breeding powers. Item rank adjustments, Alpha conversion, and mutation can
+produce outcomes outside the database. See
+[how the species database is built](PalCalc.Solver/README.md#species-database).
 
 An unverified mechanic isn't necessarily implemented incorrectly; it means the
 published evidence hasn't established the full process. Checks are also specific

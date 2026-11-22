@@ -37,7 +37,7 @@ namespace PalCalc.GenDB
                     var target = next.Item2;
 
                     // check if there's a direct way to breed from src to target
-                    if (breedingdb.BreedingByChild[target].Any(kvp => kvp.Key.Pal == src))
+                    if (breedingdb.BreedingRowsByChild[target].Any(b => b.Parent1.Pal == src || b.Parent2.Pal == src))
                     {
                         if (!palDistances[src].ContainsKey(target) || palDistances[src][target] != 1)
                         {

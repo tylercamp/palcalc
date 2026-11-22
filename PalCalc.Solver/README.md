@@ -526,21 +526,22 @@ to the findings and evidence. Various comments on PalCalc's approximations are c
 
 ### Species database
 
-GenDB reads breeding powers, priorities and special recipes from game data
-(`CombiRank` and `CombiDuplicatePriority` in `DT_PalMonsterParameter`, and
-`DT_PalCombiUnique`). It generates `breeding.json` and `breedingdb.json`, which
-are embedded in PalCalc. The solver looks up child species in that database
+GenDB reads breeding powers, priorities and eligibility from game data
+(`CombiRank`, `CombiDuplicatePriority` and `IgnoreCombi` in
+`DT_PalMonsterParameter`), along with special recipes (`DT_PalCombiUnique`). It
+generates the species catalog (`db.json`) and the pairing database (`breeding.json`),
+which are embedded in PalCalc. The solver looks up child species in that database
 instead of repeating the [game's selection process](../PALWORLD-BREEDING-MECHANICS.md#pal-species)
 for every pair during a solve.
 
-The generated database uses some shortcuts and different tie handling:
+GenDB uses the first recipe in table order that matches the parents' Tribes and
+any required genders. A recipe is included when its child and a representative
+of each parent Tribe are in PalCalc's catalog.
 
-- GenDB doesn't read `IgnoreCombi` when building its eligible roster.
-- Its same-species shortcut runs before recipe matching.
-- Recipe resolution assumes exactly one matching row.
-- Exact distance/priority ties add a non-variant preference instead of retaining
-  native table order.
-- The generated graph has no input for the game's item rank adjustment.
+If no recipe matches, GenDB averages the parents' breeding powers and rounds up.
+It selects the closest breeding power among eligible catalog Pals, excluding
+children of included recipes and Pals flagged with `IgnoreCombi`. Ties go to the
+higher breeding priority, then to the first entry in table order.
 
 ### IV probabilities
 

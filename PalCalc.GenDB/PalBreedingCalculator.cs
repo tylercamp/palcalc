@@ -1,59 +1,68 @@
-﻿using PalCalc.Model;
+﻿using PalCalc.GenDB.GameDataReaders;
+using PalCalc.Model;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PalCalc.GenDB
 {
-    internal class UniqueBreedingCombo
+    internal record UniqueBreedingCombo(
+        (string Tribe, PalGender? Gender) Parent1,
+        (string Tribe, PalGender? Gender) Parent2,
+        string ChildId
+    );
+
+    internal class PalBreedingCalculator
     {
-        public Pal Parent1 { get; set; }
-        public PalGender? Parent1Gender { get; set; }
+        private readonly Dictionary<string, Pal> palsById;
+        private readonly Dictionary<string, UPal> characterRowsById;
+        private readonly List<UniqueBreedingCombo> uniqueCombos;
+        private readonly List<Pal> rankCandidates;
 
-        public Pal Parent2 { get; set; }
-        public PalGender? Parent2Gender { get; set; }
+        public PalBreedingCalculator(List<Pal> pals, Dictionary<string, UPal> characterRowsById, List<UniqueBreedingCombo> uniqueCombos)
+        {
+            palsById = pals.ToDictionary(p => p.InternalName, StringComparer.OrdinalIgnoreCase);
+            this.characterRowsById = characterRowsById;
 
-        public Pal Child { get; set; }
-    }
+            // Skip recipes the catalog can't represent. Parents match by Tribe
+            var supportedTribes = pals.Select(p => characterRowsById[p.InternalName].Tribe).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            this.uniqueCombos = uniqueCombos
+                .Where(c =>
+                    supportedTribes.Contains(c.Parent1.Tribe) &&
+                    supportedTribes.Contains(c.Parent2.Tribe) &&
+                    palsById.ContainsKey(c.ChildId)
+                )
+                .ToList();
 
-    internal class PalBreedingCalculator(List<Pal> pals, List<UniqueBreedingCombo> uniqueCombos)
-    {
+            // Find Pals which are only produced by the `CombiRank` / "Breeding Power" calculation, rather than recipes
+            var recipeChildren = this.uniqueCombos.Select(c => c.ChildId).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            rankCandidates = pals
+                .Where(p => !characterRowsById[p.InternalName].IgnoreCombi && !recipeChildren.Contains(p.InternalName))
+                .ToList();
+        }
+
         public Pal Child(GenderedPal parent1, GenderedPal parent2)
         {
-            if (parent1.Pal == parent2.Pal) return parent1.Pal;
+            // Child-pal calc determined by direct reverse engineering of v1.0.5.102999, see docres/research/palworld-breeding
+            static bool Matches((string Tribe, PalGender? Gender) requirement, string tribe, PalGender gender) =>
+                string.Equals(requirement.Tribe, tribe, StringComparison.OrdinalIgnoreCase) &&
+                (requirement.Gender == null || requirement.Gender == gender);
 
-            var specialCombo = uniqueCombos.Where(c =>
-                (parent1.Pal == c.Parent1 && parent2.Pal == c.Parent2) ||
-                (parent2.Pal == c.Parent1 && parent1.Pal == c.Parent2)
+            var parent1Row = characterRowsById[parent1.Pal.InternalName];
+            var parent2Row = characterRowsById[parent2.Pal.InternalName];
+            var recipe = uniqueCombos.FirstOrDefault(c =>
+                (Matches(c.Parent1, parent1Row.Tribe, parent1.Gender) && Matches(c.Parent2, parent2Row.Tribe, parent2.Gender)) ||
+                (Matches(c.Parent1, parent2Row.Tribe, parent2.Gender) && Matches(c.Parent2, parent1Row.Tribe, parent1.Gender))
             );
 
-            if (specialCombo.Any())
-            {
-                return pals.Single(p =>
-                    p == specialCombo.Single(c =>
-                    {
-                        bool Matches(GenderedPal parent, Pal pal, PalGender? gender) =>
-                            parent.Pal == pal && (gender == null || parent.Gender == gender);
+            if (recipe != null)
+                return palsById[recipe.ChildId];
 
-                        return (
-                            (Matches(parent1, c.Parent1, c.Parent1Gender) && Matches(parent2, c.Parent2, c.Parent2Gender)) ||
-                            (Matches(parent2, c.Parent1, c.Parent1Gender) && Matches(parent1, c.Parent2, c.Parent2Gender))
-                        );
-                    }).Child
-                );
-            }
-
-            int childPower = (int)Math.Floor((parent1.Pal.BreedingPower + parent2.Pal.BreedingPower + 1) / 2.0f);
-            return pals
-                .Where(p => !uniqueCombos.Any(c => p == c.Child)) // pals produced by a special combo can _only_ be produced by that combo
-                .OrderBy(p => Math.Abs(p.BreedingPower - childPower))
-                .ThenByDescending(p => p.BreedingPowerPriority)
-                // if there are two pals with the same internal index, prefer the non-variant pal
-                .ThenBy(p => p.Id.IsVariant ? 1 : 0)
-                .First();
+            var childPower = (parent1.Pal.BreedingPower + parent2.Pal.BreedingPower + 1) / 2;
+            // BuildPals preserves table order, and MinBy keeps the first candidate when distance and priority tie.
+            // The game falls back to Lamball (SheepBall) when its rank search finds no child.
+            return rankCandidates.MinBy(p => (Math.Abs(p.BreedingPower - childPower), -(long)p.BreedingPowerPriority))
+                ?? palsById["SheepBall"];
         }
     }
 }

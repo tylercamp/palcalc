@@ -9,14 +9,17 @@ public class BreedableCalculatorEdgeCaseTests
 {
     [TestMethod]
     [Timeout(LoopTimeoutMs)]
-    public void Calculate_EmptyBreedingDataReturnsOwnedPals()
+    public void Calculate_EmptyBreedingDataReturnsOwnedAndUnreachableCatalogPals()
     {
         var pal = FakePal(0);
 
         var result = Calculate(FakeBreedingDB(), [Owned(pal, PalGender.MALE)], true);
 
         Assert.AreEqual(pal, result.Entries.Single().Pal);
-        Assert.AreEqual(0, result.NotReachable.Count);
+        CollectionAssert.AreEquivalent(
+            DB.Pals.Where(p => p.InternalName != BreedableCalculator.HiddenPalInternalName).ToList(),
+            result.NotReachable.ToList()
+        );
     }
 
     [DataTestMethod]

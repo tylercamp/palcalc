@@ -2,7 +2,9 @@
 using CUE4Parse.FileProvider;
 using CUE4Parse.MappingsProvider;
 using CUE4Parse.MappingsProvider.Usmap;
+using CUE4Parse.UE4.Assets.Exports.Engine;
 using CUE4Parse.UE4.Assets.Exports.Texture;
+using CUE4Parse.UE4.Objects.UObject;
 using CUE4Parse.UE4.Versions;
 using CUE4Parse_Conversion.Textures;
 using Newtonsoft.Json;
@@ -49,13 +51,40 @@ namespace PalCalc.GenDB
         static string MappingsPath = Environment.GetEnvironmentVariable("PALCALC_MAPPINGS_USMAP")
             ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Mappings.usmap");
 
-        private static List<Pal> BuildPals(List<UPal> rawPals, Dictionary<string, (int, int)> wildPalLevels, Dictionary<string, Dictionary<string, string>> palNames)
+        private static List<Pal> BuildPals(
+            List<UPal> characterRows,
+            IFileProvider provider,
+            Dictionary<string, (int, int)> wildPalLevels,
+            Dictionary<string, Dictionary<string, string>> palNames
+        )
         {
-            var allPals = rawPals
-                .Where(p => !p.InternalName.StartsWith("SUMMON_", StringComparison.InvariantCultureIgnoreCase))
-                .Where(p => !p.InternalName.EndsWith("_Oilrig", StringComparison.InvariantCultureIgnoreCase))
-                .Select(rawPal =>
+            var icons = provider.LoadPackageObject<UDataTable>(AssetPaths.PAL_ICONS_MAPPING_PATH);
+            var palsWithIcons = icons.RowMap
+                .Where(row => !row.Value.Get<FSoftObjectPath>("Icon").AssetPathName.Text.Contains("T_dummy_icon"))
+                .Select(row => row.Key.Text)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            var allPals = characterRows
+                // only get normal Pals
+                .Where(p => p.IsPal && !p.IsBoss && !p.IsRaidBoss && !p.IsTowerBoss)
+                .Where(p =>
+                    !p.InternalName.Contains("Quest") &&
+                    // (Rampaging pals have "PREDATOR" in the name. Note there's also a separate `Predator` field which is apparently completely different)
+                    !p.InternalName.Contains("PREDATOR") &&
+                    !p.InternalName.Contains("POLICE") &&
+                    !p.InternalName.StartsWith("GYM_")
+                )
+                .Where(p => palsWithIcons.Contains(p.InternalName) || palsWithIcons.Contains(p.TribeName))
+                // make sure the Pal is fully configured - unreleased Pals typically set these to -1
+                .Where(p => p.Rarity > 0 && p.RunSpeed > 0 && p.WalkSpeed > 0 && p.BreedingPower > 0)
+                .Select((row, index) => (Row: row, InternalIndex: index + 1))
+                .Where(p =>
+                    !p.Row.InternalName.StartsWith("SUMMON_", StringComparison.InvariantCultureIgnoreCase) &&
+                    !p.Row.InternalName.EndsWith("_Oilrig", StringComparison.InvariantCultureIgnoreCase)
+                )
+                .Select(entry =>
                 {
+                    var (rawPal, internalIndex) = entry;
                     var localizedNames = palNames.ToDictionary(
                         kvp => kvp.Key,
                         kvp =>
@@ -97,7 +126,7 @@ namespace PalCalc.GenDB
                         BreedingPowerPriority = rawPal.BreedingPowerPriority,
                         Price = (int)rawPal.Price,
                         Rarity = rawPal.Rarity,
-                        InternalIndex = rawPal.InternalIndex,
+                        InternalIndex = internalIndex,
                         InternalName = rawPal.InternalName,
                         Name = englishName,
                         LocalizedNames = localizedNames,
@@ -455,42 +484,6 @@ namespace PalCalc.GenDB
             }).ToList();
         }
 
-        private static UniqueBreedingCombo BuildUniqueBreedingCombo(List<Pal> pals, ((string, PalGender?), (string, PalGender?), string) combo)
-        {
-            var ((parent1Id, parent1Gender), (parent2Id, parent2Gender), childId) = combo;
-
-            var parent1 = pals.SingleOrDefault(p => p.InternalName.Equals(parent1Id, StringComparison.InvariantCultureIgnoreCase));
-            var parent2 = pals.SingleOrDefault(p => p.InternalName.Equals(parent2Id, StringComparison.InvariantCultureIgnoreCase));
-            var child = pals.SingleOrDefault(p => p.InternalName.Equals(combo.Item3, StringComparison.InvariantCultureIgnoreCase));
-
-            // (game data seems to have combos for unreleased pals; pal data scraper here skips pals with paldex no. -1)
-
-            List<string> errors = [];
-            if (parent1 == null)
-                errors.Add($"Unrecognized parent1 {parent1Id}");
-            if (parent2 == null)
-                errors.Add($"Unrecognized parent2 {parent2Id}");
-            if (child == null)
-                errors.Add($"Unrecognized child {childId}");
-
-            if (parent1 == null || parent2 == null || child == null)
-            {
-                logger.Warning("{Errors} - skipping", string.Join(", ", errors));
-                return null;
-            }
-
-            return new UniqueBreedingCombo()
-            {
-                Parent1 = parent1,
-                Parent1Gender = parent1Gender,
-
-                Parent2 = parent2,
-                Parent2Gender = parent2Gender,
-
-                Child = child
-            };
-        }
-
         private static List<BreedingResult> BuildAllBreedingResults(List<Pal> pals, PalBreedingCalculator breedingCalc)
         {
             logger.Information("Building the complete list of breeding results...");
@@ -782,11 +775,12 @@ namespace PalCalc.GenDB
 
             logger.Information("Found language codes: {codes}", localizations.Select(l => l.LanguageCode));
 
-            var rawPals = PalReader.ReadPals(provider);
+            var characterRows = PalReader.ReadPals(provider);
             var wildPalLevels = PalSpawnerReader.ReadWildLevelRanges(provider);
 
             var pals = BuildPals(
-                rawPals,
+                characterRows,
+                provider,
                 wildPalLevels,
                 palNames: localizations.ToDictionary(l => l.LanguageCode, l => l.ReadPalNames(provider))
             );
@@ -836,10 +830,8 @@ namespace PalCalc.GenDB
             );
 
             var uniqueBreedingCombos = UniqueBreedComboReader.ReadUniqueBreedCombos(provider);
-            var breedingCalc = new PalBreedingCalculator(
-                pals,
-                uniqueBreedingCombos.Select(c => BuildUniqueBreedingCombo(pals, c)).SkipNull().ToList()
-            );
+            var characterRowsById = characterRows.ToDictionary(p => p.InternalName, StringComparer.OrdinalIgnoreCase);
+            var breedingCalc = new PalBreedingCalculator(pals, characterRowsById, uniqueBreedingCombos);
 
             var db = PalDB.MakeEmptyUnsafe("v28");
 
@@ -850,15 +842,15 @@ namespace PalCalc.GenDB
             db.ActiveSkills = attacks;
             db.Elements = elements;
 
-            var genderProbabilities = rawPals.ToDictionary(p => p.InternalName, p => new Dictionary<PalGender, float>()
+            db.BreedingGenderProbability = pals.ToDictionary(p => p, p =>
             {
-                { PalGender.MALE, p.MaleProbability / 100.0f },
-                { PalGender.FEMALE, 1 - (p.MaleProbability / 100.0f) }
+                var maleProbability = characterRowsById[p.InternalName].MaleProbability / 100.0f;
+                return new Dictionary<PalGender, float>
+                {
+                    { PalGender.MALE, maleProbability },
+                    { PalGender.FEMALE, 1 - maleProbability }
+                };
             });
-            db.BreedingGenderProbability = pals.ToDictionary(
-                p => p,
-                p => genderProbabilities[p.InternalName]
-            );
 
             var rawGameSettings = GameSettingReader.ReadGameSettings(provider);
             db.BreedingMechanics = new BreedingMechanics(
