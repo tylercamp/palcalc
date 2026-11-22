@@ -368,8 +368,9 @@ to the target.
 4. Create wildcard gender representations where gender can be resolved later.
 5. When the player owns matching male and female Pals, create a composite
    candidate that can supply either gender.
-6. Build initial attack profiles from owned mastered attacks and attacks
-   available at the minimum wild level. Add training variants when enabled.
+6. Build initial attack profiles from owned Pals' recorded moves and natural
+   moves unlocked at their current level. For wild Pals, use moves available at
+   the minimum wild level. Add training variants when enabled.
 7. Add the resulting candidates to the initial frontier.
 
 ### 3. Create the frontier and first parent schedule

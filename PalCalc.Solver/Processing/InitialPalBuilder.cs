@@ -53,7 +53,7 @@ internal sealed class InitialPalBuilder(
             )
             .Select(p =>
             {
-                var learnedAttacks = p.ActiveSkills ?? [];
+                var learnedAttacks = attackTargets.HasRequiredAttacks ? p.AvailableActiveSkills(settings.DB).ToArray() : [];
                 return new OwnedPalReference(
                     instance: p,
                     effectivePassives: p.PassiveSkills.ToDedicatedPassives(target.DesiredPassives),

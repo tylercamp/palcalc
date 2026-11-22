@@ -575,11 +575,11 @@ internal sealed class AttackResultMaterializer
         reference switch
         {
             SurgeryTablePalReference surgery => LearnedAttacks(surgery.Input),
-            OwnedPalReference owned => (owned.UnderlyingInstance.ActiveSkills ?? []).Concat(TrainingAttacks(owned)),
+            OwnedPalReference owned => owned.UnderlyingInstance.AvailableActiveSkills(settings.DB).Concat(TrainingAttacks(owned)),
             WildPalReference wild => wild.Pal.WildActiveSkills(settings.DB).Concat(TrainingAttacks(wild)),
             // we only combine owned pals when their attack profiles match (see InitialPalBuilder),
             // so we can use the male's attacks when picking a loadout for the pair.
-            CompositeOwnedPalReference composite => composite.Male.UnderlyingInstance.ActiveSkills ?? [],
+            CompositeOwnedPalReference composite => composite.Male.UnderlyingInstance.AvailableActiveSkills(settings.DB),
             BredPalReference { MaterializedAttackInheritance: not null } bred => bred.MaterializedAttackInheritance.ChildLearnedAttacks,
             _ => reference.Pal.Level1ActiveSkills(settings.DB),
         };

@@ -194,13 +194,35 @@ public class LevelingTests
     }
 
     [TestMethod]
-    public void MaterializationReconstructsNonInheritableAttacksGainedDuringTraining()
+    public void SolveCanInheritAnAlreadyUnlockedNaturalAttackWithoutTraining()
+    {
+        var species = Species();
+        var child = "Wixen Noct".ToPal(DB);
+        var attack = DB.ActiveSkills.First(a => a.CanInherit && !child.Level1ActiveSkills(DB).Contains(a));
+        species.InternalAttackLeveling = [new() { AttackInternalId = attack.InternalName, Level = 10 }];
+        var parent = Owned(species, 10);
+        var mate = SolverTestScenario.Owned("Wixen", PalGender.FEMALE);
+        var solver = SolverTestScenario.Solver([parent, mate], maxBreedingSteps: 1, trainPals: false);
+
+        var result = SolverTestScenario.Solve(solver, child.Name, [attack]).OfType<BredPalReference>().Single();
+        var inheritance = result.MaterializedAttackInheritance!;
+
+        Assert.IsTrue(inheritance.Parent1Loadout.Contains(attack) || inheritance.Parent2Loadout.Contains(attack));
+        Assert.AreEqual(0, result.TotalRequiredLevels);
+        Assert.AreEqual(0, parent.ActiveSkills.Count);
+        Assert.AreEqual(0, parent.EquippedActiveSkills.Count);
+    }
+
+    [TestMethod]
+    [DataRow(5)]
+    [DataRow(20)]
+    public void MaterializationReconstructsNaturalNonInheritableAttacks(int level)
     {
         var child = "Wixen Noct".ToPal(DB);
         var attacks = DB.ActiveSkills.Where(a => a.CanInherit && !child.Level1ActiveSkills(DB).Contains(a))
             .Take(2).ToArray();
         var noop = DB.ActiveSkills.First(a => !a.CanInherit);
-        var species = Species();
+        var species = Species(level);
         species.InternalAttackLeveling =
         [
             new() { AttackInternalId = noop.InternalName, Level = 15 },
@@ -209,26 +231,25 @@ public class LevelingTests
         var target = new PalSpecifier { Pal = child, RequiredAttacks = attacks.ToList() };
         foreach (var useWild in new[] { false, true })
         {
-            var instance = Owned(species, 5);
+            var instance = Owned(species, level);
             var settings = SolverTestScenario.Solver(useWild ? [] : [instance],
                 maxBreedingSteps: int.MaxValue, maxWildPals: 1, allowedWildPals: [species]).Settings;
             var context = new AttackTargetContext(target, DB);
-            var trained = new InitialPalBuilder(settings, DB.BreedingMechanics, settings.BreedingDB, context)
-                .Build(target).First(p => p.LevelRequirements?.FinalLevel == 20);
-            Assert.IsTrue(trained.AttackProfile.HasNoopAttack);
+            var parent = new InitialPalBuilder(settings, DB.BreedingMechanics, settings.BreedingDB, context)
+                .Build(target).First(p => p.AttackProfile.HasNoopAttack && p.AttackProfile.Masks.Single() == 2);
             var carrierInstance = SolverTestScenario.Owned("Katress", PalGender.MALE);
             carrierInstance.ActiveSkills = [attacks[0]];
             var carrier = new OwnedPalReference(carrierInstance, [], new(),
                 new AttackProfile((byte)1));
             var entry = (byte)1;
             var bred = new BredPalReference(settings.GameSettings, child, PalGender.WILDCARD,
-                carrier, trained, null, [], new(BreedingMethod.Ordinary, 1), new(), 1, new AttackProfile(entry), null, null);
+                carrier, parent, null, [], new(BreedingMethod.Ordinary, 1), new(), 1, new AttackProfile(entry), null, null);
             var result = (BredPalReference)MaterializeSingle(new AttackResultMaterializer(context, settings), bred, entry);
             var instructions = result.MaterializedAttackInheritance;
             Assert.IsNotNull(instructions);
             Assert.AreEqual(1f, instructions.AttackProbability);
             Assert.IsTrue(instructions.Parent1Loadout.Contains(noop) || instructions.Parent2Loadout.Contains(noop));
-            Assert.AreEqual((1, 15), MinimumLevelingPruning.TrainingOf(result));
+            Assert.AreEqual(level < 20 ? (1, 20 - level) : (0, 0), MinimumLevelingPruning.TrainingOf(result));
         }
     }
     private static IPalReference MaterializeSingle(

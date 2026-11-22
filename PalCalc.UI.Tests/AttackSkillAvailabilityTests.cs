@@ -1,5 +1,6 @@
 using PalCalc.Model;
 using PalCalc.Solver;
+using PalCalc.UI.ViewModel.Inspector.Search;
 using PalCalc.UI.ViewModel.Mapped;
 using PalCalc.UI.ViewModel.Solver;
 
@@ -123,6 +124,30 @@ public class AttackSkillAvailabilityTests
         MaxWildPals = 0,
         BannedWildPals = [],
     };
+
+    [TestMethod]
+    public void UnlockedNaturalAttacksAreAvailableWithoutBeingEquipped()
+    {
+        var pal = "Katress".ToPal(Db);
+        var unlocked = pal.AttackLeveling(Db).First(entry => entry.Level > 1 && entry.Attack.CanInherit);
+        var equipped = pal.Level1ActiveSkills(Db).First();
+        var owned = new PalInstance
+        {
+            Pal = pal,
+            Level = unlocked.Level,
+            Gender = PalGender.MALE,
+            PassiveSkills = [],
+            ActiveSkills = [equipped],
+            EquippedActiveSkills = [equipped],
+        };
+        var viewModel = new PalInstanceViewModel(owned);
+
+        CollectionAssert.Contains(viewModel.ActiveSkills.AsModelEnumerable().ToList(), unlocked.Attack);
+        CollectionAssert.AreEqual(new[] { equipped }, viewModel.EquippedActiveSkills.AsModelEnumerable().ToArray());
+        Assert.IsTrue(new ActiveSkillSearchCriteria(unlocked.Attack).Matches(owned));
+        Assert.IsTrue(EntryFor(AttackSkillSourceViewModel.CollectAttacks([owned], MakeControls(), Targeting(pal)),
+            unlocked.Attack).IsAvailable);
+    }
 
     [TestMethod]
     public void TrainingMakesFutureOwnedAndWildAttacksAvailable()

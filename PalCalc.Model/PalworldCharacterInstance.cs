@@ -66,6 +66,11 @@ namespace PalCalc.Model
         public List<ActiveSkill> ActiveSkills { get; set; }
         public List<ActiveSkill> EquippedActiveSkills { get; set; }
 
+        public IEnumerable<ActiveSkill> AvailableActiveSkills(PalDB db) =>
+            (ActiveSkills ?? []).Union(Pal.InternalAttackLeveling
+                .Where(entry => entry.Level <= Level)
+                .Select(entry => entry.AttackInternalId.InternalToActive(db)));
+
         public bool IsOnExpedition { get; set; }
 
         public int IV_HP { get; set; }

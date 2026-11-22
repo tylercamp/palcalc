@@ -32,7 +32,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Details
                 (LocalizationCodes.LC_SAVEINSPECT_ON_EXPEDITION.Bind(), BoolText(pal.IsOnExpedition)),
                 .. pal.PassiveSkills.ZipWithIndex().Select(p => (LocalizationCodes.LC_SAVEINSPECT_PROPERTY_PASSIVE_SKILL.Bind(p.Item2 + 1), PassiveSkillViewModel.Make(p.Item1).Name)),
                 .. pal.EquippedActiveSkills.ZipWithIndex().Select(s => (LocalizationCodes.LC_SAVEINSPECT_PROPERTY_EQUIPPED_ACTIVE_SKILL.Bind(s.Item2 + 1), ActiveSkillViewModel.Make(s.Item1).Name)),
-                .. pal.ActiveSkills.ZipWithIndex().Select(s => (LocalizationCodes.LC_SAVEINSPECT_PROPERTY_ACTIVE_SKILL.Bind(s.Item2 + 1), ActiveSkillViewModel.Make(s.Item1).Name)),
+                .. pal.AvailableActiveSkills(PalDB.LoadEmbedded()).ZipWithIndex().Select(s => (LocalizationCodes.LC_SAVEINSPECT_PROPERTY_ACTIVE_SKILL.Bind(s.Item2 + 1), ActiveSkillViewModel.Make(s.Item1).Name)),
             ])
             .ToArray()
             .Select(p => new PalDetailsProperty() { Key = p.Item1, Value = p.Item2 })

@@ -19,7 +19,7 @@ namespace PalCalc.UI.ViewModel.Inspector.Search
 
     public class ActiveSkillSearchCriteria(ActiveSkill skill) : ISearchCriteria
     {
-        public bool Matches(PalInstance pal) => pal.ActiveSkills.Contains(skill);
+        public bool Matches(PalInstance pal) => pal.AvailableActiveSkills(PalDB.LoadEmbedded()).Contains(skill);
     }
 
     public class PalSearchCriteria(Pal palType) : ISearchCriteria
