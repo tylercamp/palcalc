@@ -136,17 +136,16 @@ internal sealed class InitialPalBuilder(
                 .Where(withinBreedingSteps)
                 .SelectMany(p =>
                 {
-                    var guaranteedPassives = p.GuaranteedPassiveSkills(settings.DB);
-                    var wildAttacks = p.WildActiveSkills(settings.DB).ToArray();
+                    var guaranteedPassives = p.GuaranteedPassiveSkills(settings.DB).ToArray();
                     var numIrrelevantGuaranteed = guaranteedPassives.Except(target.DesiredPassives).Count();
-                    var numAllowedRandomPassives = Math.Clamp(
-                        value: settings.MaxInputIrrelevantPassives - numIrrelevantGuaranteed,
-                        min: numIrrelevantGuaranteed > settings.MaxInputIrrelevantPassives ? 0 : 1,
-                        max: GameConstants.MaxTotalPassives - guaranteedPassives.Count()
-                    );
+                    // Keep the base candidate even when its guaranteed passives exceed the limit.
+                    var remainingPassiveBudget = Math.Max(0, settings.MaxInputIrrelevantPassives - numIrrelevantGuaranteed);
+
+                    var wildAttacks = p.WildActiveSkills(settings.DB).ToArray();
+                    var maxRandomPassives = Math.Min(remainingPassiveBudget, GameConstants.MaxTotalPassives - guaranteedPassives.Length);
 
                     return Enumerable
-                        .Range(0, numAllowedRandomPassives)
+                        .Range(0, maxRandomPassives + 1)
                         .Select(numRandomPassives =>
                             new WildPalReference(
                                 p,

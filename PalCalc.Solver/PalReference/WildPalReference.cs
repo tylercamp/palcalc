@@ -23,9 +23,6 @@ namespace PalCalc.Solver.PalReference
             ArgumentNullException.ThrowIfNull(mechanics);
 
             Pal = pal;
-            SelfBreedingEffort =
-                mechanics.TimeToCatch(pal) /
-                mechanics.PassivesWildAtMostN[numRandomPassives];
             EffectivePassives = guaranteedPassives.Concat(Enumerable.Range(0, numRandomPassives).Select(i => new RandomPassiveSkill())).ToList();
             Gender = PalGender.WILDCARD;
             AttackProfile = attackProfile;
@@ -34,6 +31,13 @@ namespace PalCalc.Solver.PalReference
 
             if (guaranteedPassives.Any(t => !pal.GuaranteedPassivesInternalIds.Contains(t.InternalName))) throw new InvalidOperationException();
             if (EffectivePassives.Count > GameConstants.MaxTotalPassives) throw new InvalidOperationException();
+
+            // If we accept all remaining slots, even rolls above the slot limit fit after capping.
+            var timePerCatch = mechanics.TimeToCatch(pal);
+            var captureProbability = EffectivePassives.Count == GameConstants.MaxTotalPassives
+                ? 1f
+                : mechanics.PassivesWildAtMostN[numRandomPassives];
+            SelfBreedingEffort = timePerCatch / captureProbability;
 
             EffectivePassivesHash = EffectivePassives.Select(p => p.InternalName).SetHash();
             IVs = new IV_Set() { HP = IV_Value.Random, Attack =  IV_Value.Random, Defense = IV_Value.Random };

@@ -110,14 +110,12 @@ and [finishing results](PalCalc.Solver/README.md#finishing-the-results).
 
 ### Wild random passive counts
 
-PalCalc currently assumes that wild Pals are equally likely to receive zero,
-one, two, three or four random passives. The game's ordinary wild-generation
-weights instead strongly favor one attempted addition. Existing passives, special
-spawns and failed selections can also change the final count.
-
-This mismatch can affect the estimated capture effort for wild starting Pals
-with a limited number of unwanted passives. The solver's probability logic
-hasn't yet been updated to the [recovered wild-passive rules](PALWORLD-BREEDING-MECHANICS.md#random-passives-on-wild-pals).
+PalCalc estimates capture effort using the game's ordinary wild-passive weights
+and the slots left after guaranteed passives. It assumes each attempted addition
+fills a slot. Failed selections can leave a wild Pal with fewer passives, so
+catches with room for only a few unwanted passives can be easier than estimated.
+Special spawns and capture bonuses can also change the final count. See the
+[wild-passive rules](PALWORLD-BREEDING-MECHANICS.md#random-passives-on-wild-pals).
 
 ### Other omitted behavior and verification limits
 

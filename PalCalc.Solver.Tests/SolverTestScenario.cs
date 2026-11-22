@@ -67,7 +67,8 @@ internal static class SolverTestScenario
         SpecialCakePolicy specialCakePolicy = SpecialCakePolicy.Never,
         bool trainPals = true,
         bool useGenderReversers = false,
-        PalBreedingDB? breedingDB = null
+        PalBreedingDB? breedingDB = null,
+        int? maxInputIrrelevantPassives = null
     ) =>
         new(
             solver: new BreedingSolver(),
@@ -82,7 +83,7 @@ internal static class SolverTestScenario
                 maxWildPals: maxWildPals,
                 allowedWildPals: allowedWildPals?.ToList() ?? [],
                 bannedBredPals: bannedBredPals?.ToList() ?? [],
-                maxInputIrrelevantPassives: GameConstants.MaxTotalPassives,
+                maxInputIrrelevantPassives: maxInputIrrelevantPassives ?? GameConstants.MaxTotalPassives,
                 maxBredIrrelevantPassives: maxBredIrrelevantPassives,
                 maxEffort: maxEffort ?? TimeSpan.MaxValue,
                 maxThreads: maxThreads,

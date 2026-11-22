@@ -48,4 +48,13 @@ public class BreedingMechanicsTests
         Assert.AreEqual(0.10f, mechanics.PassiveRandomAddedProbability[3]);
         Assert.AreEqual(0f,    mechanics.PassiveRandomAddedProbability[4]);
     }
+
+    [TestMethod]
+    public void WildPassiveProbability_MatchesOrdinaryAttemptWeights()
+    {
+        CollectionAssert.AreEqual(
+            new[] { 0.10f, 0.86f, 0.96f, 0.99f, 1f },
+            Enumerable.Range(0, 5).Select(count => mechanics.PassivesWildAtMostN[count]).ToArray()
+        );
+    }
 }

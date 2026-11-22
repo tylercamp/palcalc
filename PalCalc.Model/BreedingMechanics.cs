@@ -10,7 +10,6 @@ public sealed class BreedingMechanics
     * 
     * - What's the formula for how long breeding will take?
     * - What's the probability of wild pals having a specific gender?
-    * - What's the probability of wild pals having exactly N passives?
     */
 
     public const int MaxInheritedIVs = 3;
@@ -43,15 +42,15 @@ public sealed class BreedingMechanics
         PassiveProbabilityDirect = NormFromWeights(0, 4, passiveInheritanceWeights);
         PassiveRandomAddedProbability = NormFromWeights(0, 4, passiveRandomWeights);
 
-        // probability of a wild pal having, at most, N random passives
-        // (not scrapable - assume equal probability of gaining anywhere from 0 through 4 random passives)
-        // (20% chance of exactly N passives)
+        // Cumulative odds before the slot cap. REA recovered the native PassiveSkillAppendNumWeights
+        // defaults [10, 76, 10, 3, 1] for Palworld 1.0.5.102999.
+        // See ../docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#wild-pal-passives.
         PassivesWildAtMostN = new Dictionary<int, float>
         {
-            { 0, 0.2f },
-            { 1, 0.4f },
-            { 2, 0.6f },
-            { 3, 0.8f },
+            { 0, 0.10f },
+            { 1, 0.86f },
+            { 2, 0.96f },
+            { 3, 0.99f },
             { 4, 1.0f },
         };
 

@@ -383,8 +383,9 @@ attempt can fail to add a passive.
 
 These weights come from the game code and are not visible in the game's assets.
 See the [initialization evidence](docres/research/palworld-breeding/assessments/1.0.5.102999/evidence.md#wild-pal-passives)
-for their source and the conditions which control random filling. PalCalc's current
-estimate still uses a [simplified wild-passive distribution](LIMITATIONS.md#wild-random-passive-counts).
+for their source and the conditions which control random filling. PalCalc uses
+these weights and the remaining slots to estimate capture effort, with the
+[assumption that random filling succeeds](LIMITATIONS.md#wild-random-passive-counts).
 
 ### Yakumo passive order
 

@@ -363,7 +363,8 @@ to the target.
    target.
 2. When owned Pals have the same useful properties, choose one to represent
    them.
-3. Represent allowed wild Pals, including the effort needed to capture them.
+3. Represent allowed wild Pals with different caps on random passives.
+   Guaranteed passives take up slots before any random additions.
 4. Create wildcard gender representations where gender can be resolved later.
 5. When the player owns matching male and female Pals, create a composite
    candidate that can supply either gender.

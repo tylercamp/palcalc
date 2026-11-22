@@ -75,36 +75,41 @@ public class InitialPalBuilderTests
     }
 
     [TestMethod]
-    public void Build_AddsConfiguredWildPassiveCountVariants()
+    [DataRow(0, 4, 4, 1f)]
+    [DataRow(0, 1, 1, 0.86f)]
+    [DataRow(3, 4, 1, 1f)]
+    [DataRow(3, 3, 0, 0.10f)]
+    [DataRow(3, 2, 0, 0.10f)]
+    [DataRow(4, 4, 0, 1f)]
+    [DataRow(4, 3, 0, 1f)]
+    public void Build_PricesWildCandidatesWithGuaranteedPassivesAndRandomCaps(
+        int guaranteedCount, int inputLimit, int maxRandomPassives, float captureProbability)
     {
-        var katress = "Katress".ToPal(SolverTestScenario.DB);
+        var db = SolverTestScenario.DB;
+        var katress = new Pal
+        {
+            Id = "Katress".ToPal(db).Id,
+            GuaranteedPassivesInternalIds = db.StandardPassiveSkills.Take(guaranteedCount)
+                .Select(passive => passive.InternalName).ToList(),
+        };
         var configuredSolver = SolverTestScenario.Solver(
             ownedPals: [],
-            specialCakePolicy: SpecialCakePolicy.Never,
             maxBreedingSteps: 1,
             maxWildPals: 1,
-            allowedWildPals: [katress]
+            allowedWildPals: [katress],
+            maxInputIrrelevantPassives: inputLimit
         );
 
-        var seeds = new InitialPalBuilder(
-            configuredSolver.Settings,
-            configuredSolver.Settings.DB.BreedingMechanics,
-            configuredSolver.Settings.BreedingDB,
-            new AttackTargetContext(Target(), configuredSolver.Settings.DB)
-        ).Build(Target());
+        var target = Target();
+        var seeds = NewBuilder(configuredSolver, target).Build(target).OfType<WildPalReference>().ToList();
 
         CollectionAssert.AreEqual(
-            new[] { 0, 1, 2, 3 },
-            seeds
-                .OfType<WildPalReference>()
-                .Select(reference =>
-                    reference.EffectivePassives.Count(
-                        passive => passive is RandomPassiveSkill
-                    )
-                )
-                .Order()
-                .ToArray()
+            Enumerable.Range(0, maxRandomPassives + 1).ToArray(),
+            seeds.Select(reference => reference.EffectivePassives.Count(passive => passive is RandomPassiveSkill)).ToArray()
         );
+
+        Assert.AreEqual(guaranteedCount, seeds[0].EffectivePassives.Count);
+        Assert.AreEqual(db.BreedingMechanics.TimeToCatch(katress) / captureProbability, seeds[^1].SelfBreedingEffort);
     }
 
     [TestMethod]
