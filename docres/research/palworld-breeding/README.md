@@ -60,7 +60,7 @@ and keep the review provisional rather than guessing a release label.
 
 | Mechanic | Current explanation | Last checked game version / date | Status |
 | --- | --- | --- | --- |
-| World-map coordinates | [Coordinate transforms and calibration](../palworld-misc/README.md#world-map-coordinates) | — | No published native verification |
+| World-map coordinates | [Coordinate labels and map pins](../palworld-misc/README.md#world-map-coordinates) | — | Blueprint formulas recovered |
 | Egg-production time | [PalCalc's timing model](../../../PalCalc.Solver/README.md#egg-production-time) | — | No published native verification |
 
 These get targeted reviews when a change, reported problem, or explicit request

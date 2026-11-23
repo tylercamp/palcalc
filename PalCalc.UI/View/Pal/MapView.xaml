@@ -38,9 +38,11 @@
     
     -->
 
+    <!-- Keep pin positions fractional so zoom doesn't magnify layout rounding. -->
     <vu:MapViewer
         Grid.ColumnSpan="100"
         Grid.RowSpan="100"
+        UseLayoutRounding="False"
         InitialZoom="3.5"
         InitialX="{Binding NormalizedCoords.X}"
         InitialY="{Binding NormalizedCoords.Y}"

@@ -10,40 +10,32 @@ changes, or specific requests. Their status is recorded in the
 
 ## World-map coordinates
 
-PalCalc uses positions from saves to show the in-game map coordinate numbers and
-to place markers on its map image. These are two different 2D outputs from a 3D
-world position. [MapCoord](../../../PalCalc.Model/BaseInstance.cs) currently ignores
-Z and applies an affine transform to X and Y: a calculation that can scale,
-rotate, and shift the coordinates.
+PalCalc uses saved positions to display map coordinates and place pins. Both
+conversions use world X and Y and were recovered directly from Palworld's
+shipped Blueprint code. [MapCoord](../../../PalCalc.Model/BaseInstance.cs)
+implements them.
+
+### Coordinate labels
+
+The game's `WBP_Map_Base_C.PrintPosition` widget sets the scale and origin for
+the coordinate labels. PalCalc uses the same formula and rounds the displayed
+numbers to whole values.
 
 ```text
-output_x = matrix[0,0] * world_x + matrix[0,1] * world_y + matrix[0,2]
-output_y = matrix[1,0] * world_x + matrix[1,1] * world_y + matrix[1,2]
+mapX = (worldY - 158000) / 459
+mapY = (worldX + 123888) / 459
 ```
 
-- `UIFromWorldCoord` uses `GameConstants.WorldToMapMatrix` for the coordinate
-  numbers shown on the in-game map.
-- `NormalizedFromWorldCoord` uses `GameConstants.WorldToImageMatrix` for normalized
-  map-image positions. Multiply by the displayed image dimensions for pixels.
-  The affine calculation itself does not clamp positions to the image.
+### Map pin placement
 
-[GameConstants](../../../PalCalc.Model/GameConstants.cs) holds the current matrices.
-[BuildDBProgram](../../../PalCalc.GenDB/BuildDBProgram.cs) documents their provenance:
-world/map/image samples are used by
-[MapTransformSolver](../../../PalCalc.GenDB/MapTransformSolver.cs) to fit affine
-matrices. [MapReader](../../../PalCalc.GenDB/GameDataReaders/MapReader.cs) reads
-map bounds and a region texture, but this alone does not establish the native UI
-coordinate formula. Its current scope recognizes `MainMap` and `FirstRegion`.
+The game's `WorldLocationToWidgetOffset` helper uses the `MainMap` bounds from
+`DT_WorldMapUIData` to express pin positions as fractions of the image width and
+height. PalCalc applies those positions to the exported `FirstRegion` texture.
 
-This description comes from the repository source, reviewed on 2026-10-18. The
-research record hasn't verified the game's map-conversion formula or checked
-these calibration constants against a particular game version.
-Their presence in PalCalc's code doesn't mean they have been verified with REA.
-
-A targeted reassessment should record the game version, executable and map-asset identities,
-input/output units, axis swaps/signs/offsets, Z handling, region/texture selection,
-and behavior at several known landmarks and boundaries. Preserve samples or
-selected native evidence and distinguish fitted approximation from exact formula.
+```text
+u = (worldY + 724400) / 1448800
+v = (349400 - worldX) / 1448800
+```
 
 ## Egg-production time
 

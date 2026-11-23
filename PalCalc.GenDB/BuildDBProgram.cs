@@ -891,6 +891,7 @@ namespace PalCalc.GenDB
 
             if (mapInfo != null)
             {
+                // MapCoord assumes the exported FirstRegion texture covers the MainMap landscape bounds.
                 using var rawData = mapInfo.MapTexture.Decode(ETexturePlatform.DesktopMobile).ToSkBitmap();
                 var resized = rawData.Resize(new SKSizeI() { Width = 8192, Height = 8192 }, SKFilterQuality.High);
 
@@ -899,26 +900,6 @@ namespace PalCalc.GenDB
                 using (var o = new FileStream("../PalCalc.UI/Resources/Map.jpeg", FileMode.Create))
                     encoded.SaveTo(o);
             }
-
-            // I can't find a reliable method for extracting the info tying the in-game map to game coordinates. Instead I gathered
-            // a bunch of samples of world coords (XYZ from game data), map coords (coords on in-game map), and image-pixel coords
-            // (x/y coords in the map image itself), and use those samples to solve for the transformation matrices we need.
-            //
-            // The output should be kept in sync with `GameConstants.WorldToMapMatrix` and `GameConstants.WorldToImageMatrix`
-            // (copy/paste and just insert braces and commas to make it compile)
-            //
-            // Sample data is based on spawners for overworld boss Pals like the Mammorest near the beginning. 
-            //
-            // Boss pal spawns are at:
-            // /Pal/Content/Pal/DataTable/UI/DT_BossSpawnerLoactionData.uasset
-            //
-            // ---
-            //
-            // `sampleMapTexSize` is the image size used when the "map pixel coordinates" were gathered
-            //
-            // I was using a 4096x4096 image at the time, this should only change if the `ImageCoords` in `coord-samples.json` are updated
-            // from a new image resolution
-            MapTransformSolver.Run("coord-samples.json", sampleMapTexSize: 4096);
 
             CSVExport.Write(
                 outDir: "out-csv",

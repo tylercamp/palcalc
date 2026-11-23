@@ -14,5 +14,5 @@ To investigate those rules or compare another game build, follow the
 [mechanics research workflow](../docres/research/palworld-breeding/README.md).
 Extracting a field tells us its value, but we still need to check how the game uses it.
 
-Map export and calibrated coordinate transforms are described under
+Map export and the game-derived coordinate transforms are described under
 [additional game logic](../docres/research/palworld-misc/README.md#world-map-coordinates).

@@ -282,7 +282,7 @@ namespace PalCalc.UI.View.Utils
                 : oldScale / zoomFactor;
 
             // Limit min/max scale if desired
-            double maxScale = Math.Min(
+            double maxScale = 2.5f * Math.Min(
                 _imageNaturalSize.Width / _container.ActualWidth,
                 _imageNaturalSize.Height / _container.ActualHeight
             );
