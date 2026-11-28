@@ -59,6 +59,14 @@ when updating linked summaries for other readers.
 | Wild-Pal attacks | <status> | <date> | <scope> | <classification> | [Conclusions](#wild-pal-attacks) | [Evidence](evidence.md#wild-pal-attacks) |
 | Wild-Pal gender | <status> | <date> | <scope> | <classification> | [Conclusions](#wild-pal-gender) | [Evidence](evidence.md#wild-pal-gender) |
 
+### Supporting mechanics
+
+<Include this table when the version has supporting findings.>
+
+| Mechanic | Status | Checked date | Findings |
+| --- | --- | --- | --- |
+| <topic> | <status and checked scope> | <date> | [Conclusions](#topic) / [Evidence](evidence.md#topic) |
+
 ## Child species
 
 <Use the per-mechanic outline below.>
@@ -133,7 +141,8 @@ For each heading, give:
 For species, include recipes/genders, eligibility, rounding/item inputs, self-pairs,
 ties/table order, and final replacements. For wild Pals, distinguish spawn, learning,
 capture, and saved contents; recipe gender checks aren't child-gender generation.
-Supporting mechanics can be added after the required sections when investigated.
+Add investigated supporting mechanics after the required mechanic sections in
+both files. Use matching topic headings so the summary links stay stable.
 
 ## Companion evidence.md outline
 

@@ -59,6 +59,11 @@ and provenance; an implementation formula is not proof of the game's formula.
 
 ## Adding another topic
 
+Core mechanics affect the accuracy or completeness of calculations relevant to
+the breeding solver. Add them to the required mechanics checklist in the research
+hub. Supporting mechanics cover the remaining game behavior documented by the
+project. Add them to the supporting mechanics checklist.
+
 Use the [breeding research introduction](../palworld-breeding/README.md) and
 [assessment workflow](../palworld-breeding/ASSESSMENT-WORKFLOW.md). Keep the same
 separation between the full game model, any proposed PalCalc model, and current
@@ -66,15 +71,16 @@ implementation. State whether model derivation or comparison is applicable,
 outside the request, or has no existing implementation to compare. Use a section
 in the relevant game-version report under
 `../palworld-breeding/assessments/<game-version>/`, with conclusions in
-`assessment.md` and the scoped model/evidence in `evidence.md`. Link it from the
-supporting-mechanics table and record relevant checked-version, game-mechanics or
+`assessment.md` and the scoped model and evidence in `evidence.md`. Use matching
+headings. Link the findings from the relevant assessment summary table and the
+research hub. Record relevant checked-version, game-mechanics or
 assessment-scope changes in the changelog. Keep raw generated artifacts under
 `_REA-ANALYSIS/runs/` and temporary topic documentation under `_REA-ANALYSIS/txt/`,
 following the shared workflow's publication boundary.
 
 State what PalCalc needs, choose the smallest useful scope, and follow the shared
-workflow. Start with a section here linking its current explanation and evidence;
-add a separate reference page only when that explanation becomes too large.
+workflow. Keep the versioned findings in the report. Add a short explanation
+and links here when readers need a reference for a supporting calculation.
 A completed assessment records the game version/date, supporting build identity,
 full scoped model, data contracts, applicable PalCalc model/comparison, checks and
 unresolved limits. Use pseudocode, a schema, decision table or state transitions

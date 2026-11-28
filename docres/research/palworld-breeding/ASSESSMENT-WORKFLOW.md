@@ -18,7 +18,9 @@ mechanics in the checklist. A targeted task can investigate one mechanic without
 rechecking the others, but doesn't establish full version verification.
 
 Record the required topic/question set or checklist revision defining full
-coverage. When adding a topic, explicitly classify it as required or supporting.
+coverage. When adding a topic, classify it as core (required) if it affects the
+accuracy or completeness of calculations relevant to the breeding solver.
+Classify other topics as supporting.
 Earlier full-coverage claims retain their recorded scope; expanded requirements
 need explicit assessment.
 
@@ -50,7 +52,7 @@ later edits leave the compared revision identifiable.
 For every mechanic, record ordinary, item, mutation, spawn, capture, or other
 relevant modes and the final observable boundary reached. An excluded mode is a
 visible limitation, not implicit coverage. Supporting mechanics such as map
-conversion and breeding time are optional unless requested or implicated by a
+conversion are optional unless requested or implicated by a
 change or reported problem.
 
 ### Define the questions and boundaries
@@ -255,6 +257,12 @@ When findings appear incompatible:
 Keep one report per game version, with stable sections for every required
 mechanic in both files. Use the [template](ASSESSMENT-TEMPLATE.md).
 
+Put checked supporting topics in the separate Supporting mechanics table below
+the required-mechanics summary. The versioned assessment records checked scope
+and conclusions. Its companion evidence records the formulas, source inputs,
+and observations needed to re-check them. The research hub indexes both, and
+the supplementary README provides short explanations and links.
+
 ```text
 docres/research/palworld-breeding/assessments/<game-version>/
   assessment.md   conclusions, version changes, PalCalc comparison, checks
@@ -387,6 +395,8 @@ with the result:
   unresolved contradictions and dependent claims accounted for.
 - Evidence references resolve; summaries, coverage, dates, version identities and
   the declared question set agree.
+- Supporting-mechanics links, checked dates, and coverage agree between the
+  versioned assessment and the research hub.
 - Each finding has an explicit PalCalc disposition: implemented and checked,
   deliberately scoped out or approximated, or outside the requested comparison.
   Explain the consequences of omissions and remaining gaps. A comparison outside
