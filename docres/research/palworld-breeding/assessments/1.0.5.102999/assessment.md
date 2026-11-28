@@ -34,7 +34,7 @@
 
 | Mechanic | Status | Checked date | Findings |
 | --- | --- | --- | --- |
-| World-map coordinates | Blueprint formulas recovered | — | [Coordinate labels and map pin placement](../../palworld-misc/README.md#world-map-coordinates) |
+| World-map coordinates | Verified for MainMap labels and pin projection | 2026-11-22 | [Conclusions](#world-map-coordinates) / [Evidence](evidence.md#world-map-coordinates) |
 | Egg-production time | Verified for base time and timing inputs | 2026-11-23 | [Conclusions](#egg-production-time) / [Evidence](evidence.md#egg-production-time) |
 
 ## Child species
@@ -467,6 +467,20 @@ Capture additions separately use the actual trainer, owner-history, IsPlayer and
 group predicate. This invocation's ownership-history update occurs after its
 augmentation check; it cannot retroactively block that check. Preservation through
 every release/re-capture mode is not established.
+
+## World-map coordinates
+
+**Supporting mechanic, checked 2026-11-22.** For the shipped Windows Steam
+`MainMap`, displayed X/Y and map pins both use world X/Y, with world Y supplying
+the horizontal coordinate. Displayed labels use the calibration in
+`WBP_Map_Base_C.PrintPosition`. Pins use the landscape bounds in
+`DT_WorldMapUIData.MainMap`, then scale the normalized position to the map canvas
+and center the icon on that point.
+
+The retained Blueprint and asset checks cover both conversions. PalCalc uses
+the same transforms and its bundled map image matches the `FirstRegion` texture
+export. See the [formulas, asset properties, and widget calls](evidence.md#world-map-coordinates).
+Other map rows, effective mod overrides, and live placement are outside this check.
 
 ## Egg-production time
 

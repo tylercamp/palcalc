@@ -12,6 +12,11 @@ holds current coverage; version reports hold findings, evidence and corrections.
   Steam build. Detailed effect modeling is deferred.
   [Conclusions and coverage](assessments/1.0.5.102999/assessment.md#egg-production-time).
 
+## 1.0.5.102999 — 2026-11-22: world-map coordinates
+
+- **Assessment scope:** checked the shipped `MainMap` coordinate labels and pin
+  projection. [Conclusions and evidence](assessments/1.0.5.102999/assessment.md#world-map-coordinates).
+
 ## 1.0.5.102999 — 2026-10-29: first verified baseline
 
 - **Latest checked version:** 1.0.5.102999 for all eight required mechanics:

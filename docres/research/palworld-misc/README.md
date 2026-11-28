@@ -15,6 +15,9 @@ conversions use world X and Y and were recovered directly from Palworld's
 shipped Blueprint code. [MapCoord](../../../PalCalc.Model/BaseInstance.cs)
 implements them.
 
+See the [versioned map-coordinate evidence](../palworld-breeding/assessments/1.0.5.102999/evidence.md#world-map-coordinates)
+for the calibration inputs, asset fields, and widget call chain.
+
 ### Coordinate labels
 
 The game's `WBP_Map_Base_C.PrintPosition` widget sets the scale and origin for

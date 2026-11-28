@@ -60,7 +60,7 @@ and keep the review provisional rather than guessing a release label.
 
 | Mechanic | Research question and current explanation | Last checked game version / date | Status |
 | --- | --- | --- | --- |
-| World-map coordinates | [Coordinate labels and map pins](../palworld-misc/README.md#world-map-coordinates) | — | Blueprint formulas recovered |
+| World-map coordinates | How do world positions become displayed X/Y coordinates and map pins? [Conclusions](assessments/1.0.5.102999/assessment.md#world-map-coordinates) / [Evidence](assessments/1.0.5.102999/evidence.md#world-map-coordinates) | 1.0.5.102999 / 2026-11-22 | Verified for MainMap labels and pin projection |
 | Egg-production time | What is the normal Breeding Farm's base time, and which mechanics affect the timer or egg production? [Conclusions](assessments/1.0.5.102999/assessment.md#egg-production-time) / [Evidence](assessments/1.0.5.102999/evidence.md#egg-production-time) | 1.0.5.102999 / 2026-11-23 | Verified for base time and timing inputs |
 
 These get targeted reviews when a change, reported problem, or explicit request

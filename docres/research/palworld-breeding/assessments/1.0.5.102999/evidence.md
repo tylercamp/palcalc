@@ -4204,6 +4204,53 @@ supplied-input and saved-transfer questions; no broader spawner census is inferr
 | Native function registration, `0x142848850` | `ev_a70883abf84aa1be60a2e640457730fd7c9639a0ecda54fa7604e69f240e84b2` |
 | PalArenaSoloNPCSpawner class, `0x1428464d0` | `ev_92b7a432731aa8efd303bef67737c609ee3fb4c223dda953871f8ff1fd9fd9aa` |
 
+## World-map coordinates
+
+The November 22 check used decoded CUE4Parse exports from the shipped Windows
+Steam base archive for build `25246127`. The fresh extraction matched the
+retained package hashes for `DT_WorldMapUIData`, `WBP_Map_Base`, `WBP_Map_Body`,
+and `BP_PalUIFunctionLibrary`. The inputs below are for `MainMap`.
+
+### Displayed coordinate labels
+
+`WBP_Map_Base_C.PrintPosition` defines calibration vectors `(335112, 617000)`
+and `(-582888, -301000)`. The two `MapRangeUnclamped` calls map the world Y
+and X ranges, respectively, to `[-1000, 1000]`. Each input span is `918000`
+world units, giving `459` world units per displayed unit. The midpoints are
+`158000` for world Y and `-123888` for world X. The widget formats each result
+with zero fractional digits.
+
+```text
+mapX = (worldY - 158000) / 459
+mapY = (worldX + 123888) / 459
+```
+
+### Map pin placement
+
+In `DT_WorldMapUIData.Rows.MainMap`, `landScapeRealPositionMin` has X/Y
+`(-1099400, -724400)` and `landScapeRealPositionMax` has `(349400, 724400)`.
+Both spans are `1448800` world units. `WorldLocationToWidgetOffset` normalizes
+world Y from its minimum and world X from its maximum, reversing the vertical
+axis. World Z is unused in both conversions.
+
+```text
+u = (worldY + 724400) / 1448800
+v = (349400 - worldX) / 1448800
+```
+
+`WBP_Map_Body` routes Add Icon By Location through `ProjectIconToWorldMap` in
+`BP_PalUIFunctionLibrary`. That function multiplies the normalized result by
+the target canvas slot size. The caller sets slot alignment to `(0.5, 0.5)`.
+The two opposite landscape corners therefore project to `(0, 0)` and `(1, 1)`
+in normalized coordinates, with the upper-left corner at maximum world X and
+minimum world Y.
+
+`MainMap.mapBlockNum` is `(1, 1)`. Its `textureDataMap[FirstRegion]` points to
+`/Game/Pal/Texture/UI/Map/T_WorldMap`, with `blockSize = (1, 1)` and
+`gridPosition = (0, 0)`. Re-exporting that tile at 8192 × 8192 with GenDB's
+Skia settings reproduced PalCalc's bundled `Map.jpeg` byte for byte
+(SHA-256 `32fdd36dd39c8e57c38fcc0b138a0315c4f350ede5579a467bacfc0a4fdb4350`).
+
 ## Egg-production time
 
 Scope: Windows Steam `1.0.5.102999`, build `25246127`, shipped `BreedFarm`, from
