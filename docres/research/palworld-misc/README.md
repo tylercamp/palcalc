@@ -39,11 +39,15 @@ v = (349400 - worldX) / 1448800
 
 ## Egg-production time
 
-The maintained explanation is in
-[solver README](../../../PalCalc.Solver/README.md#egg-production-time),
-because this is PalCalc's effort model. It distinguishes the configurable
-base time, parent speed factors, PalCalc's availability allowance, and incubation.
-No native timing assessment is currently published.
+In Palworld 1.0.5.102999, a normal Breeding Farm requires 300 seconds of active
+breeding at the base rate. Parent and camp breeding-speed effects change the rate,
+and parent work state gates progress. Cake and available output space are checked
+at completion. Day/night has no direct effect on the timer. See the
+[game timing assessment](../palworld-breeding/assessments/1.0.5.102999/assessment.md#egg-production-time)
+for the timing inputs and asset references.
+
+[PalCalc's timing model](../../../PalCalc.Solver/README.md#egg-production-time)
+describes the solver's configurable base time and availability allowance.
 
 Reassess when breeding-speed modifiers, farm behavior, or time estimates change.
 Trace the egg-created event independently of incubation and separate active

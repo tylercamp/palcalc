@@ -30,6 +30,13 @@
 | Wild-Pal attacks | Verified | 2026-10-29 | Form/settings-to-saved-input bridge; overall available set, natural/Tamago, NPC source and storage; KingWhale selected action start preserves availability inputs | First verified baseline | [Conclusions](#wild-pal-attacks) | [Evidence](evidence.md#wild-pal-attacks) |
 | Wild-Pal gender | Verified | 2026-10-24 | Species/form initialization or supplied saved gender through installation, actor binding and ordinary/KingWhale capture | First verified baseline | [Conclusions](#wild-pal-gender) | [Evidence](evidence.md#wild-pal-gender) |
 
+### Supporting mechanics
+
+| Mechanic | Status | Checked date | Findings |
+| --- | --- | --- | --- |
+| World-map coordinates | Blueprint formulas recovered | — | [Coordinate labels and map pin placement](../../palworld-misc/README.md#world-map-coordinates) |
+| Egg-production time | Verified for base time and timing inputs | 2026-11-23 | [Conclusions](#egg-production-time) / [Evidence](evidence.md#egg-production-time) |
+
 ## Child species
 
 Question: which saved child ID reaches hatch? Inputs are parent IDs/Tribes/genders, recipe and character tables, `CombiRankBonus`, mutation settings and supplied pickup effects. Ordinary/item/mutation, primary and additional eggs are included. Output is saved CharacterID, distinct from egg-item metadata. Selection and shipped first-load tie/first-match inputs are established; supplied pickup effects remain conditional inputs, without arbitrary activation-frequency claims.
@@ -461,6 +468,32 @@ group predicate. This invocation's ownership-history update occurs after its
 augmentation check; it cannot retroactively block that check. Preservation through
 every release/re-capture mode is not established.
 
+## Egg-production time
+
+**Verified for the base time and timing inputs, checked 2026-11-23.** The normal
+Breeding Farm (`BreedFarm`) in the shipped Windows Steam build requires
+**300 seconds (5 minutes)** of uninterrupted breeding at the unmodified rate.
+
+| Mechanic | Role in egg production |
+| --- | --- |
+| Parent `BreedSpeed` and camp `BreedSpeed_InBaseCamp` | Both affect how fast the timer advances. |
+| Parent work state and assignment | Progress requires a working male and female. Assignment changes can reset progress. |
+| Cake and output space | Checked when the timer fills. Cake can affect how many eggs a cycle produces. |
+| Day/night, general Work Speed, and incubation settings | The farm's timer has no direct input or branch for these. If sleep takes a parent out of the working state, the work-state gate pauses progress. |
+
+| Value to re-check | Game asset and property |
+| --- | --- |
+| 300-second threshold and eligible cakes | `BP_BuildObject_BreedFarm` → `BreedFarmParameter_GEN_VARIABLE` → `BreedRequiredRealTime` and `TargetItemIds` |
+| 20 output places | `PalMapObjectBreedFarmParameterComponent.ExistPalEggMaxNum` defaults to `20` in native code. `BP_BuildObject_BreedFarm` leaves it unset. |
+| Philanthropist (+100% per parent) | `DT_PassiveSkill_Main` → `Test_PalEgg_HatchingSpeed_Up` → `EffectType1 = BreedSpeed`, `EffectValue1 = 100.0` |
+| Example camp bonus (+20% when active) | `DT_PassiveSkill_Main` → `Plesiosaur_PartnerSkill_1` → `EffectType1 = BreedSpeed_InBaseCamp`, `EffectValue1 = 20.0` |
+| Two eggs per `Cake03` cycle | `DA_BreedingItemEffectData` → `ItemEffectMap[Cake03].BreedCount = 2` |
+
+Static analysis establishes which inputs the normal farm uses. Camp-effect
+activation and stacking, work schedules, wall-clock estimates, and PalCalc
+modeling are deferred. See the [timing evidence](evidence.md#egg-production-time)
+for the game assets and native observations.
+
 ## Checks
 
 Static native/data evidence supports the published models. Reconstruction checks covered
@@ -539,4 +572,4 @@ affecting the declared output, rather than the existence of a possible listener.
 | Other spawn/group/world states | Unique NPC, World Tree, organization/named-group and trainer/history/IsPlayer/exclusion predicates retain their supplied inputs. The ordinary Neutral result is not generalized to different states. |
 | Live frequencies, exact RNG replay and mid-reset reentry | Static rules and labelled nominal calculations do not establish these outputs. A concrete output-relevant reentry route would require a targeted follow-up. |
 | Mods, replacement network implementations and player configuration/data | Excluded from the shipped-base target. Recovered record/notification contracts do not guarantee arbitrary replacements harmless. |
-| Solver implementation and supporting topics | Comparison is with the recorded documentation/model baseline. Solver fixes, breeding time and map conversion remain separate work. |
+| Solver implementation and supporting topics | The October baseline compares the recorded documentation and model. See [supporting mechanics](#supporting-mechanics) for breeding time and map conversion. |

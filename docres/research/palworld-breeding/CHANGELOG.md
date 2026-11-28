@@ -5,6 +5,13 @@ observed changes in game mechanics, and changes to the questions or mechanics
 assessments target. The [research hub](README.md#current-verification-status)
 holds current coverage; version reports hold findings, evidence and corrections.
 
+## 1.0.5.102999 — 2026-11-23: normal Breeding Farm timing
+
+- **Assessment scope:** established the normal Breeding Farm's base time and
+  identified what affects the timer and egg production in the shipped Windows
+  Steam build. Detailed effect modeling is deferred.
+  [Conclusions and coverage](assessments/1.0.5.102999/assessment.md#egg-production-time).
+
 ## 1.0.5.102999 — 2026-10-29: first verified baseline
 
 - **Latest checked version:** 1.0.5.102999 for all eight required mechanics:

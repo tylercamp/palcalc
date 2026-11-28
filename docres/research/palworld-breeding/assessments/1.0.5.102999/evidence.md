@@ -4204,6 +4204,128 @@ supplied-input and saved-transfer questions; no broader spawner census is inferr
 | Native function registration, `0x142848850` | `ev_a70883abf84aa1be60a2e640457730fd7c9639a0ecda54fa7604e69f240e84b2` |
 | PalArenaSoloNPCSpawner class, `0x1428464d0` | `ev_92b7a432731aa8efd303bef67737c609ee3fb4c223dda953871f8ff1fd9fd9aa` |
 
+## Egg-production time
+
+Scope: Windows Steam `1.0.5.102999`, build `25246127`, shipped `BreedFarm`, from
+the normal farm's model update to its world-egg spawn callback. The executable
+and top-level base archive SHA-256 match [the identities above](#identity-and-methods).
+The packaged `Pal/Config/DefaultGame.ini` gives the version. The timing trace
+uses instructions decoded from that executable, retained REA/Ghidra observations
+for the successful child generation and egg-spawn route, and fresh CUE4Parse
+asset exports. These are static observations. Configured mods, live timing,
+incubation and the combined breeding/incubation facility are outside scope.
+
+### Farm binding and inputs
+
+`DT_MapObjectMasterDataTable` resolves `BreedFarm` to `BP_BuildObject_BreedFarm`.
+Its `ConcreteModelClass` is `PalMapObjectBreedFarmModel`. The asset's
+`BreedFarmParameter_GEN_VARIABLE` is a `PalMapObjectBreedFarmParameterComponent`
+with `BreedRequiredRealTime = 300.0` and accepted item IDs `Cake` through `Cake05`.
+The Blueprint leaves the native parameter component's `ExistPalEggMaxNum`
+default at 20. The native constructor (`1429aadd0`) initializes `+0xa0` to
+`1200.0f` and `+0xa4` to `20`; the cooked `300.0f` overrides the time. The setup
+routine `143014fd0` reads the resolved component at `+0xa0` and `+0xa4`, copying
+them into model fields `BreedRequiredRealTime` (`+0x24c`) and `ExistPalEggMaxNum`
+(`+0x248`). The normal farm Blueprint `.uasset` and `.uexp` hashes are
+`32f67ac8cf1b4719872e461a569b41709d70bf48e064af05dac30e55e590ca75` and
+`7c13630f020ad7b637d8805387d5c4f77d6f08d166a6044919b9c4bd75bfa909`.
+
+The native model constructor `1429aad40` installs the primary vtable at
+`147570fb0`, whose slot `+0x3f8` contains `1430225a0`. That entry forwards the
+float update delta to `14301b370` after resolving the work object and passing
+the same `CanProceedBreeding` check reached by the reflected method
+(`1429adfe0` → `143005700` → `142de32b0`). The check calls a work-object gate
+and requires both `EPalGenderType::Male` and `::Female` among the workers passing
+`14333c9f0`. The latter requires `PalWorkAssign.State` (`+0x70`) and
+`WorkingState` (`+0x72`) to both equal their enum's `Working` value (`2`).
+The two enum entries are at `14787d850` and `14787d960`, respectively. A skipped
+tick does not call the timer update. How the AI schedules departures, including
+sleep and breaks, is a separate question about the inputs to those state checks.
+
+### Rate and progress
+
+`14301b370` calls `142ddae90` at `14301b417`. The rate helper initializes a
+float accumulator to `1.0` and visits the valid work assignment records with
+`143331590`. Callback `142de2ea0` tail-calls `142dd6d60`, which resolves the
+assigned Pal and its effect component. If that component supplies effect
+`0x4c` (`BreedSpeed`), it updates the accumulator with
+`accumulator + evaluatedModifier(1.0, 0x4c) - 1.0` (`142dd6ddd`–`142dd6de9`).
+This adds the two bonuses for the normal pair. Reflection enum entries
+`1476908d0` and `1476908e0` map `0x4c` and `0x4d` to `BreedSpeed` and
+`BreedSpeed_InBaseCamp`.
+
+The normal update resolves the farm's base camp, then passes the camp effect
+source to the rate helper. At `142ddaef9`–`142ddaf0d`, the latter evaluates
+`0x4d` via `142db8260` and multiplies the returned factor by the parent
+accumulator. Both missing camp context and a failed effect-component lookup
+give a neutral camp factor of `1.0`. The camp helper `142d81300` calls the base
+effect evaluator `14314f840` with baseline `1.0`, then adds any matching
+supplemental contribution returned via `142f64e80`. The base evaluator maps
+the resolved percentage to `1 + percent * 0.01` on its percentage branch
+(`14314f890`), and its input evaluator (`143151a60`) includes maximum and sum
+paths. Use the *effective* camp factor in the farm formula. The farm does not
+sum every raw passive row as a camp bonus. This trace does not establish the
+complete gameplay rules for which camp effects activate and stack.
+
+The shipped `DT_PassiveSkill_Main` and its `DT_PassiveSkill_Main_Common` parent
+both give Philanthropist (`Test_PalEgg_HatchingSpeed_Up`) `BreedSpeed = 100.0`
+with `ToSelf`. The `Plesiosaur_PartnerSkill_1` row supplies
+`BreedSpeed_InBaseCamp = 20.0` with `ToBuildObject`, as an example of a camp
+percentage when applied. The asset's `MutationPal_Babysitter` row supplies a
+separate `BreedSpeed_InBaseCamp = 30.0` effect in addition to its incubation
+effect. The active timing examples use resolved input factors and do not assume
+that every copy of these Pal effects stacks.
+
+The normal update's decisive arithmetic is `mulss` at `14301b41c`, `addss`
+from `BreedProgressTime` at `14301b420`, a zero/upper-bound clamp at
+`14301b430`–`14301b43b`, and writeback at `14301b43f`. There is no direct
+work-speed, Cake, incubation-option or day/night multiplier in this calculation.
+
+```text
+if the farm work gate and working male/female check pass:
+    parentFactor = 1 + sum(parentEffectFactor - 1 for supported parent effects)
+    rate = parentFactor * effectiveCampFactor
+    progress = clamp(progress + deltaSeconds * rate, 0, requiredTime)
+    if progress >= requiredTime and there is room for the selected batch:
+        if a qualifying breeding item was consumed successfully:
+            attempt to generate and spawn each egg in the batch
+            progress = 0
+```
+
+Nominal time from zero with a fixed positive rate is `requiredTime / rate`.
+With varying inputs, the game accrues the per-update products until the
+threshold. It uses binary32 arithmetic and handles completion on an update.
+The time formula is a continuous equivalent, not a guarantee of a specific
+frame or wall-clock duration. With `rate = 1`, from zero, the nominal result is
+300 seconds. With one and two active `+100%` parent passives it is 150 and 100
+seconds. With two and a `1.20` camp factor it is about 83.3 seconds. The
+arithmetic and current asset values were checked independently of gameplay.
+
+### Completion and reset
+
+The threshold check (`14301b453`) occurs before the remaining-slot and item
+checks. Available space is `ExistPalEggMaxNum - SpawnedEggInstanceIds.Num()`.
+At `14301b558`–`14301b563`, available space must cover at least one egg or the
+selected item's higher `BreedCount` from `DA_BreedingItemEffectData`.
+`Cake03` has `BreedCount = 2`. With sufficient room, the update calls item
+consume helper `142df93e0`. Missing eligible items or consume errors finish the
+update at the existing capped progress. A successful consume invokes `143021510`
+once for each egg in the batch. That procedure generates a child save and,
+on generation success, invokes the normal world's spawn request (`1430216b0`
+→ `1430cc2f0`), which passes the child in `InitialCharacter` data on the
+[world-egg route](#shared-child-save-boundary). The request's callback
+`143013970` records the spawned instance ID for result `0x3e` if not already
+tracked. No guaranteed spawn is inferred on failures. The updater resets
+progress after the generation/spawn attempts (`14301b6cf`), without waiting for
+that callback or carrying overflow forward.
+
+An assignment change can separately zero the timer. Each advancing update
+snapshots worker IDs into `LastProceedWorkerIndividualIds`. The named
+`OnUpdateAssignedCharacter` path (`1429aed40` → `1430197b0`) clears progress if
+`142de8500` finds a nonempty new ID in the current assignment set that was
+absent from the last-progress set. A tick skipped purely because the work
+gate fails performs no timer reset in the tick routine.
+
 ## Shared capture and storage boundary
 
 Updated 2026-10-22. The recovered ordering is:
